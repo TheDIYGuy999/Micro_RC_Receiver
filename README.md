@@ -6,6 +6,7 @@
 - I2C header
 - NRF24L01+ SMD module integrated
 - very small size
+- Eagle files are also provided, if you want to build your own receiver!
 
 ## Usage
 
