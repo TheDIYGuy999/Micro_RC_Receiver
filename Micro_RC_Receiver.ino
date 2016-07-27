@@ -1,6 +1,9 @@
-// 4 Channel Micro Receiver with 4 standard RC Servo Outputs
-// 328P TQFP 32 soldered with 8MHz resonator, 2.4GHz NRF24L01 SMD radio module
-// TB6612FNG dual dc motor driver
+// 4 Channel Micro RC Receiver with 4 standard RC Servo Outputs
+// ATMEL Mega 328P TQFP 32 soldered directly to the board, 8MHz external resonator,
+// 2.4GHz NRF24L01 SMD radio module, TB6612FNG dual dc motor driver
+
+// Used in:
+// - Maisto Mustang Fastback (vehicle number 3)
 
 //
 // =======================================================================================================
