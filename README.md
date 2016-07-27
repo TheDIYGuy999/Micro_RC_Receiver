@@ -4,7 +4,7 @@
 - integrated TB6612FNG dual dc motor driver
 - serial header
 - I2C header
-- ICSP header for programming with Arduino IDE (use Pro Micro 3.3V / 8MHz Board definition and set brownout voltage to 1.8V)
+- ICSP header for programming with Arduino IDE (use Pro Mini 3.3V / 8MHz Board definition and set brownout voltage to 1.8V)
 - NRF24L01+ SMD module integrated
 - very small size
 - Eagle files are also provided, if you want to build your own receiver!
