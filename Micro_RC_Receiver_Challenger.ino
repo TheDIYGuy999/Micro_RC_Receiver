@@ -39,6 +39,10 @@
 // =======================================================================================================
 //
 
+// Battery type
+static boolean liPo = true;
+static byte cutoffVoltage = 3.0;
+
 // Vehicle address
 int vehicleNumber = 4; // This number must be unique for each vehicle!
 const int maxVehicleNumber = 5;
@@ -121,7 +125,7 @@ void setup() {
   radio.setChannel(1);
   radio.setPALevel(RF24_PA_HIGH);
   radio.setDataRate(RF24_250KBPS);
-  radio.setAutoAck(true);                  // Ensure autoACK is enabled
+  radio.setAutoAck(pipeIn[vehicleNumber - 1], true); // Ensure autoACK is enabled
   radio.enableAckPayload();
   radio.enableDynamicPayloads();
   radio.setRetries(5, 5);                  // 5x250us delay (blocking!!), max. 5 retries
@@ -247,7 +251,7 @@ void driveMotors() {
     maxPWM = 255; // Full
   }
 
-  if (!payload.batteryOk) maxPWM = 0; // Stop the vehicle, if the battery is empty!
+  if (!payload.batteryOk && liPo) maxPWM = 0; // Stop the vehicle, if the battery is empty!
 
   // Acceleration & deceleration limitation (ms per 1 step PWM change)
   if (data.mode2) {
@@ -276,7 +280,7 @@ void driveMotors() {
 void checkBattery() {
   payload.vcc = readVcc() / 1000.0 ;
 
-  if (payload.vcc >= 3.0) {
+  if (payload.vcc >= cutoffVoltage) {
     //payload.batteryOk = true;
 #ifdef DEBUG
     Serial.print(payload.vcc);

@@ -3,7 +3,7 @@
 // 2.4GHz NRF24L01 SMD radio module, TB6612FNG dual dc motor driver
 
 // Used in:
-// - Micro RC Reveiver GearGmax Porsche GT3 RS 4.0
+// - Maisto Mustang Fastback (vehicle number 3)
 
 //
 // =======================================================================================================
@@ -40,11 +40,11 @@
 //
 
 // Battery type
-static boolean liPo = false;
-static byte cutoffVoltage = 2.1;
+static boolean liPo = true;
+static byte cutoffVoltage = 3.0;
 
 // Vehicle address
-int vehicleNumber = 5; // This number must be unique for each vehicle!
+int vehicleNumber = 3; // This number must be unique for each vehicle!
 const int maxVehicleNumber = 5;
 
 // the ID number of the used "radio pipe" must match with the selected ID on the transmitter!
@@ -93,7 +93,7 @@ unsigned long millisLightOff = 0;
 // SYNTAX: IN1, IN2, PWM, min. input value, max. input value, neutral position width
 // invert rotation direction true or false
 TB6612FNG Motor1(motor1_in1, motor1_in2, motor1_pwm, 0, 100, 6, false); // Drive motor
-TB6612FNG Motor2(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 4, false); // Steering motor
+TB6612FNG Motor2(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 2, false); // Steering motor
 
 // Status LED objects
 statusLED battLED(false);
@@ -251,13 +251,13 @@ void driveMotors() {
     maxPWM = 255; // Full
   }
 
-  if (!payload.batteryOk && liPo) maxPWM = 0; // Stop the vehicle, if the battery is empty & is a LiPo
+  if (!payload.batteryOk && liPo) maxPWM = 0; // Stop the vehicle, if the battery is empty! 
 
   // Acceleration & deceleration limitation (ms per 1 step PWM change)
   if (data.mode2) {
     maxAcceleration = 12; // Limited
   } else {
-    maxAcceleration = 3; // Full
+    maxAcceleration = 7; // Full
   }
 
   // ***************** Note! The ramptime is intended to protect the gearbox! *******************
@@ -268,7 +268,7 @@ void driveMotors() {
     millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
   }
 
-  Motor2.drive(data.axis1, 255, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+  Motor2.drive(data.axis1, 190, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
 }
 
 //
