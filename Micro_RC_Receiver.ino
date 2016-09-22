@@ -3,7 +3,7 @@
 // 2.4GHz NRF24L01 SMD radio module, TB6612FNG dual dc motor driver
 
 // Used in:
-// - Maisto Mustang Fastback (vehicle number 3)
+// - Micro RC Reveiver Generic (vehicle number 1)
 
 //
 // =======================================================================================================
@@ -39,8 +39,12 @@
 // =======================================================================================================
 //
 
+// Battery type
+static boolean liPo = false;
+static byte cutoffVoltage = 2.1;
+
 // Vehicle address
-int vehicleNumber = 3; // This number must be unique for each vehicle!
+int vehicleNumber = 1; // This number must be unique for each vehicle!
 const int maxVehicleNumber = 5;
 
 // the ID number of the used "radio pipe" must match with the selected ID on the transmitter!
@@ -64,7 +68,7 @@ RcData data;
 struct ackPayload {
   float vcc; // vehicle vcc voltage
   float batteryVoltage; // vehicle battery voltage
-  boolean batteryOk; // the vehicle battery voltage is OK!
+  boolean batteryOk = true; // the vehicle battery voltage is OK!
 };
 ackPayload payload;
 
@@ -121,7 +125,7 @@ void setup() {
   radio.setChannel(1);
   radio.setPALevel(RF24_PA_HIGH);
   radio.setDataRate(RF24_250KBPS);
-  radio.setAutoAck(true);                  // Ensure autoACK is enabled
+  radio.setAutoAck(pipeIn[vehicleNumber - 1], true); // Ensure autoACK is enabled
   radio.enableAckPayload();
   radio.enableDynamicPayloads();
   radio.setRetries(5, 5);                  // 5x250us delay (blocking!!), max. 5 retries
@@ -247,11 +251,13 @@ void driveMotors() {
     maxPWM = 255; // Full
   }
 
+  if (!payload.batteryOk && liPo) maxPWM = 0; // Stop the vehicle, if the battery is empty! 
+
   // Acceleration & deceleration limitation (ms per 1 step PWM change)
   if (data.mode2) {
     maxAcceleration = 12; // Limited
   } else {
-    maxAcceleration = 7; // Full
+    maxAcceleration = 0; // Full
   }
 
   // ***************** Note! The ramptime is intended to protect the gearbox! *******************
@@ -262,7 +268,7 @@ void driveMotors() {
     millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
   }
 
-  Motor2.drive(data.axis1, 190, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+  Motor2.drive(data.axis1, 255, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
 }
 
 //
@@ -274,8 +280,8 @@ void driveMotors() {
 void checkBattery() {
   payload.vcc = readVcc() / 1000.0 ;
 
-  if (payload.vcc >= 3.0) {
-    payload.batteryOk = true;
+  if (payload.vcc >= cutoffVoltage) {
+    //payload.batteryOk = true;
 #ifdef DEBUG
     Serial.print(payload.vcc);
     Serial.println(" Vcc OK");
