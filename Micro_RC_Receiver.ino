@@ -1,9 +1,10 @@
-// 4 Channel Micro RC Receiver with 4 standard RC Servo Outputs
+// 4 Channel "Micro RC" Receiver with 4 standard RC Servo Outputs
 // ATMEL Mega 328P TQFP 32 soldered directly to the board, 8MHz external resonator,
 // 2.4GHz NRF24L01 SMD radio module, TB6612FNG dual dc motor driver
 
-// Used in:
-// - Micro RC Reveiver Generic (vehicle number 1)
+// * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * *
+
+const float codeVersion = 1.3; // Software revision
 
 //
 // =======================================================================================================
@@ -31,7 +32,9 @@
 // Optional for motor PWM frequency adjustment:
 #include <PWMFrequency.h> // https://github.com/kiwisincebirth/Arduino/tree/master/libraries/PWMFrequency
 
+// Tabs (header files in sketch directory)
 #include "readVCC.h"
+#include "vehicleConfig.h"
 
 //
 // =======================================================================================================
@@ -39,16 +42,15 @@
 // =======================================================================================================
 //
 
-// Battery type
-static boolean liPo = false;
-static byte cutoffVoltage = 2.1;
-
-// Vehicle address
-int vehicleNumber = 1; // This number must be unique for each vehicle!
-const int maxVehicleNumber = 5;
+// Radio channels (126 channels are supported)
+byte chPointer = 0; // Channel 1 (the first entry of the array) is active by default
+const byte NRFchannel[] {
+  1, 2
+};
 
 // the ID number of the used "radio pipe" must match with the selected ID on the transmitter!
-const uint64_t pipeIn[maxVehicleNumber] = { 0xE9E8F0F0B1LL, 0xE9E8F0F0B2LL, 0xE9E8F0F0B3LL, 0xE9E8F0F0B4LL, 0xE9E8F0F0B5LL };
+const uint64_t pipeIn[] = { 0xE9E8F0F0B1LL, 0xE9E8F0F0B2LL, 0xE9E8F0F0B3LL, 0xE9E8F0F0B4LL, 0xE9E8F0F0B5LL };
+const int maxVehicleNumber = (sizeof(pipeIn) / (sizeof(uint64_t)));
 
 // Hardware configuration: Set up nRF24L01 radio on hardware SPI bus & pins 8 (CE) & 7 (CSN)
 RF24 radio(8, 7);
@@ -69,6 +71,7 @@ struct ackPayload {
   float vcc; // vehicle vcc voltage
   float batteryVoltage; // vehicle battery voltage
   boolean batteryOk = true; // the vehicle battery voltage is OK!
+  byte channel = 1; // the channel number
 };
 ackPayload payload;
 
@@ -96,7 +99,7 @@ TB6612FNG Motor1(motor1_in1, motor1_in2, motor1_pwm, 0, 100, 6, false); // Drive
 TB6612FNG Motor2(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 2, false); // Steering motor
 
 // Status LED objects
-statusLED battLED(false);
+statusLED tailLight(false);
 statusLED headLight(false);
 
 // Timer
@@ -116,13 +119,16 @@ void setup() {
   delay(3000);
 #endif
 
+  // Vehicle setup
+  setupVehicle();
+
   // LED setup
-  battLED.begin(1); // 1 = TXO Pin
+  if (tailLights)tailLight.begin(A1); // A1 = Servo 2 Pin
   headLight.begin(0); // 0 = RXI Pin
 
   // Radio setup
   radio.begin();
-  radio.setChannel(1);
+  radio.setChannel(NRFchannel[chPointer]);
   radio.setPALevel(RF24_PA_HIGH);
   radio.setDataRate(RF24_250KBPS);
   radio.setAutoAck(pipeIn[vehicleNumber - 1], true); // Ensure autoACK is enabled
@@ -141,7 +147,7 @@ void setup() {
 
   // Servo pins
   servo1.attach(A0);
-  servo2.attach(A1);
+  if (!tailLights) servo2.attach(A1);
   servo3.attach(A2);
   servo4.attach(A3);
 
@@ -167,19 +173,19 @@ void setup() {
 
 void led() {
 
-  // Red LED (ON = battery empty, blinking = OK
-  if (payload.batteryOk) {
-    battLED.flash(140, 150, 500, vehicleNumber); // ON, OFF, PAUSE, PULSES
-  } else {
-    battLED.off(); // Always ON = battery low voltage
-  }
-
-  // Headlights switches off 10s after the vehicle did stop
+  // Lights are switching off 10s after the vehicle did stop
   if (millis() - millisLightOff >= 10000) {
-    headLight.off();
+    headLight.off(); // Headlight off
+    tailLight.off(); // Taillight off
   }
   else {
     headLight.on();
+    if (Motor1.brakeActive()) { // if braking detected from TB6612FNG motor driver
+      tailLight.on(); // Brake light (full brightness)
+    }
+    else {
+      tailLight.flash(10, 14, 0, 0); // Taillight: 10 on  / 14 off = about 40% brightness (soft PWM)
+    }
   }
 }
 
@@ -210,6 +216,14 @@ void readRadio() {
 #endif
   }
 
+  // Switch channel
+  if (millis() - lastRecvTime > 500) {
+    chPointer ++;
+    if (chPointer >= sizeof((*NRFchannel) / sizeof(byte))) chPointer = 0;
+    radio.setChannel(NRFchannel[chPointer]);
+    payload.channel = NRFchannel[chPointer];
+  }
+
   if (millis() - lastRecvTime > 1000) { // bring all servos to their middle position, if no RC signal is received during 1s!
     data.axis1 = 50; // Aileron (Steering for car)
     data.axis2 = 50; // Elevator
@@ -228,10 +242,10 @@ void readRadio() {
 //
 
 void writeServos() {
-  servo1.write(map(data.axis1, 100, 0, 45, 135) ); // 45 - 135°
-  servo2.write(map(data.axis2, 100, 0, 45, 135) ); // 45 - 135°
-  servo3.write(map(data.axis3, 100, 0, 45, 135) ); // 45 - 135°
-  servo4.write(map(data.axis4, 100, 0, 45, 135) ); // 45 - 135°
+  servo1.write(map(data.axis1, 100, 0, lim1L, lim1R) ); // 45 - 135°
+  if (!tailLights) servo2.write(map(data.axis2, 100, 0, lim2L, lim2R) ); // 45 - 135°
+  servo3.write(map(data.axis3, 100, 0, lim3L, lim3R) ); // 45 - 135°
+  servo4.write(map(data.axis4, 100, 0, lim4L, lim4R) ); // 45 - 135°
 }
 
 //
@@ -241,23 +255,24 @@ void writeServos() {
 //
 
 void driveMotors() {
+
   int maxPWM;
-  int maxAcceleration;
+  byte maxAcceleration;
 
   // Speed limitation (max. is 255)
   if (data.mode1) {
-    maxPWM = 170; // Limited
+    maxPWM = maxPWMlimited; // Limited
   } else {
-    maxPWM = 255; // Full
+    maxPWM = maxPWMfull; // Full
   }
 
-  if (!payload.batteryOk && liPo) maxPWM = 0; // Stop the vehicle, if the battery is empty! 
+  if (!payload.batteryOk && liPo) maxPWM = 0; // Stop the vehicle, if the battery is empty!
 
-  // Acceleration & deceleration limitation (ms per 1 step PWM change)
+  // Acceleration & deceleration limitation (ms per 1 step input signal change)
   if (data.mode2) {
-    maxAcceleration = 12; // Limited
+    maxAcceleration = maxAccelerationLimited; // Limited
   } else {
-    maxAcceleration = 0; // Full
+    maxAcceleration = maxAccelerationFull; // Full
   }
 
   // ***************** Note! The ramptime is intended to protect the gearbox! *******************
@@ -268,7 +283,7 @@ void driveMotors() {
     millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
   }
 
-  Motor2.drive(data.axis1, 255, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+  Motor2.drive(data.axis1, 190, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
 }
 
 //
@@ -278,21 +293,32 @@ void driveMotors() {
 //
 
 void checkBattery() {
-  payload.vcc = readVcc() / 1000.0 ;
+  payload.vcc = vccAverage();
 
   if (payload.vcc >= cutoffVoltage) {
-    //payload.batteryOk = true;
-#ifdef DEBUG
-    Serial.print(payload.vcc);
-    Serial.println(" Vcc OK");
-#endif
   } else {
     payload.batteryOk = false;
-#ifdef DEBUG
-    Serial.print(payload.vcc);
-    Serial.println(" Vcc Low!");
-#endif
   }
+}
+
+// Voltage averaging subfunction ----
+float vccAverage() {
+  static int raw[6];
+
+  if (raw[0] == 0) {
+    for (int i = 0; i <= 6; i++) {
+      raw[i] = vccMv; // Init array with 3300mV
+    }
+  }
+
+  raw[5] = raw[4];
+  raw[4] = raw[3];
+  raw[3] = raw[2];
+  raw[2] = raw[1];
+  raw[1] = raw[0];
+  raw[0] = readVcc();
+  float average = (raw[0] + raw[1] + raw[2] + raw[3] + raw[4] + raw[5]) / 6000.0;
+  return average;
 }
 
 //

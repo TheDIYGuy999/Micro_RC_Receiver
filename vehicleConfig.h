@@ -1,0 +1,225 @@
+#ifndef vehicleConfig_h
+#define vehicleConfig_h
+
+#include "Arduino.h"
+
+const byte configID = 4; // <- Select the correct vehicle configuration ID here before uploading!
+
+//
+// =======================================================================================================
+// DECLARATION OF VEHICLE SPECIFIC VARIABLES
+// =======================================================================================================
+//
+
+// Battery type
+boolean liPo; // If "true", the vehicle can't be reactivated once the cutoff voltage is reached
+float cutoffVoltage; // Min. battery discharge voltage
+
+// Board type
+int vccMv; // The nominal Vcc voltage (in millivolts) of your ATMEL Mega 328P
+boolean battSense; // "true", if voltage divider resistors for battery voltage sensing are wired to input "A7"
+
+// Vehicle address
+int vehicleNumber; // This number must be unique for each vehicle!
+
+// Lights
+boolean tailLights; // Caution: the taillights are wired to the servo pin 2!
+
+// Servo limits (45 - 135 means - 45° to 45° from the servo middle position)
+byte lim1L, lim1R; // Servo 1
+byte lim2L, lim2R;
+byte lim3L, lim3R;
+byte lim4L, lim4R; // Servo 4
+
+// Motor configuration 
+int maxPWMfull; // (100% PWM is 255)
+int maxPWMlimited;
+byte maxAccelerationFull;// (ms per 1 step input signal change)
+byte maxAccelerationLimited;
+
+//
+// =======================================================================================================
+// VEHICLE SPECIFIC CONFIGURATIONS
+// =======================================================================================================
+//
+
+void setupVehicle() {
+  switch (configID) {
+    // Vehicle ID 0 (generic configuration)---------------------------------------------------------------
+    case 0:
+      // Battery type
+      liPo = false;
+      cutoffVoltage = 2.1;
+
+      // Board type
+      vccMv = 3300;
+      battSense = false;
+
+      // Vehicle address
+      vehicleNumber = 1;
+
+      // Lights
+      tailLights = false;
+
+      // Servo limits
+      lim1L = 45; lim1R = 135;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 0;
+      maxAccelerationLimited = 12;
+      break;
+      
+    // Vehicle ID 1 (not in use)---------------------------------------------------------------------------
+    case 1:
+      // Battery type
+      liPo = false;
+      cutoffVoltage = 2.1;
+      
+      // Board type
+      vccMv = 3300;
+      battSense = false;
+
+      // Vehicle address
+      vehicleNumber = 1;
+
+      // Lights
+      tailLights = false;
+
+      // Servo limits
+      lim1L = 45; lim1R = 135;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 7;
+      maxAccelerationLimited = 12;
+      break;
+
+// Vehicle ID 2 (not in use)------------------------------------------------------------------------------
+    case 2:
+      // Battery type
+      liPo = false;
+      cutoffVoltage = 2.1;
+      
+      // Board type
+      vccMv = 3300;
+      battSense = false;
+
+      // Vehicle address
+      vehicleNumber = 2;
+
+      // Lights
+      tailLights = false;
+
+      // Servo limits
+      lim1L = 45; lim1R = 135;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 7;
+      maxAccelerationLimited = 12;
+      break;
+
+// Vehicle ID 3 (Maisto Mustang GT Fastback)---------------------------------------------------------------
+    case 3:
+      // Battery type
+      liPo = true;
+      cutoffVoltage = 2.9;
+      
+      // Board type
+      vccMv = 3300;
+      battSense = false;
+
+      // Vehicle address
+      vehicleNumber = 3;
+
+      // Lights
+      tailLights = false;
+
+      // Servo limits
+      lim1L = 60; lim1R = 129;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 7;
+      maxAccelerationLimited = 12;
+      break;
+
+// Vehicle ID 4 (Maisto Dodge Challenger)-------------------------------------------------------------------
+    case 4:
+      // Battery type
+      liPo = true;
+      cutoffVoltage = 2.9;
+      
+      // Board type
+      vccMv = 3300;
+      battSense = false;
+
+      // Vehicle address
+      vehicleNumber = 4;
+
+      // Lights
+      tailLights = true;
+
+      // Servo limits
+      lim1L = 120; lim1R = 55;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 7;
+      maxAccelerationLimited = 12;
+      break;
+
+// Vehicle ID 5 (GearGmax / KIDZTECH TOYS Porsche GT3 RS 4.0)-----------------------------------------------
+    case 5:
+      // Battery type
+      liPo = false;
+      cutoffVoltage = 2.1;
+      
+      // Board type
+      vccMv = 3300;
+      battSense = false;
+
+      // Vehicle address
+      vehicleNumber = 5;
+
+      // Lights
+      tailLights = false;
+
+      // Servo limits
+      lim1L = 45; lim1R = 135;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 3;
+      maxAccelerationLimited = 12;
+      break;
+
+  }
+}
+
+#endif
