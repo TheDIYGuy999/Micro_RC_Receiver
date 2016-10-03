@@ -3,11 +3,11 @@
 
 #include "Arduino.h"
 
-const byte configID = 4; // <- Select the correct vehicle configuration ID here before uploading!
+const byte configID = 1; // <- Select the correct vehicle configuration ID here before uploading!
 
 //
 // =======================================================================================================
-// DECLARATION OF VEHICLE SPECIFIC VARIABLES
+// DECLARATION OF VEHICLE SPECIFIC CONFIGURATION VARIABLES
 // =======================================================================================================
 //
 
@@ -16,7 +16,6 @@ boolean liPo; // If "true", the vehicle can't be reactivated once the cutoff vol
 float cutoffVoltage; // Min. battery discharge voltage
 
 // Board type
-int vccMv; // The nominal Vcc voltage (in millivolts) of your ATMEL Mega 328P
 boolean battSense; // "true", if voltage divider resistors for battery voltage sensing are wired to input "A7"
 
 // Vehicle address
@@ -31,11 +30,14 @@ byte lim2L, lim2R;
 byte lim3L, lim3R;
 byte lim4L, lim4R; // Servo 4
 
-// Motor configuration 
+// Motor configuration
 int maxPWMfull; // (100% PWM is 255)
 int maxPWMlimited;
 byte maxAccelerationFull;// (ms per 1 step input signal change)
 byte maxAccelerationLimited;
+
+// Steering configuration (100% torque is 255)
+byte steeringTorque;
 
 //
 // =======================================================================================================
@@ -49,10 +51,9 @@ void setupVehicle() {
     case 0:
       // Battery type
       liPo = false;
-      cutoffVoltage = 2.1;
+      cutoffVoltage = 2.9;
 
       // Board type
-      vccMv = 3300;
       battSense = false;
 
       // Vehicle address
@@ -72,17 +73,19 @@ void setupVehicle() {
       maxPWMlimited = 170;
       maxAccelerationFull = 0;
       maxAccelerationLimited = 12;
+
+      // Steering configuration
+      steeringTorque = 255;
       break;
-      
-    // Vehicle ID 1 (not in use)---------------------------------------------------------------------------
+
+    // Vehicle ID 1 (battery sense test)------------------------------------------------------------------
     case 1:
       // Battery type
-      liPo = false;
-      cutoffVoltage = 2.1;
-      
+      liPo = true;
+      cutoffVoltage = 2.9;
+
       // Board type
-      vccMv = 3300;
-      battSense = false;
+      battSense = true;
 
       // Vehicle address
       vehicleNumber = 1;
@@ -99,18 +102,20 @@ void setupVehicle() {
       // Motor configuration
       maxPWMfull = 255;
       maxPWMlimited = 170;
-      maxAccelerationFull = 7;
+      maxAccelerationFull = 3;
       maxAccelerationLimited = 12;
+      
+      // Steering configuration
+      steeringTorque = 255;
       break;
 
-// Vehicle ID 2 (not in use)------------------------------------------------------------------------------
+    // Vehicle ID 2 (not in use)------------------------------------------------------------------------------
     case 2:
       // Battery type
       liPo = false;
-      cutoffVoltage = 2.1;
-      
+      cutoffVoltage = 2.9;
+
       // Board type
-      vccMv = 3300;
       battSense = false;
 
       // Vehicle address
@@ -130,16 +135,18 @@ void setupVehicle() {
       maxPWMlimited = 170;
       maxAccelerationFull = 7;
       maxAccelerationLimited = 12;
+      
+      // Steering configuration
+      steeringTorque = 255;
       break;
 
-// Vehicle ID 3 (Maisto Mustang GT Fastback)---------------------------------------------------------------
+    // Vehicle ID 3 (Maisto Mustang GT Fastback)---------------------------------------------------------------
     case 3:
       // Battery type
       liPo = true;
       cutoffVoltage = 2.9;
-      
+
       // Board type
-      vccMv = 3300;
       battSense = false;
 
       // Vehicle address
@@ -159,16 +166,18 @@ void setupVehicle() {
       maxPWMlimited = 170;
       maxAccelerationFull = 7;
       maxAccelerationLimited = 12;
+      
+      // Steering configuration
+      steeringTorque = 255;
       break;
 
-// Vehicle ID 4 (Maisto Dodge Challenger)-------------------------------------------------------------------
+    // Vehicle ID 4 (Maisto Dodge Challenger)-------------------------------------------------------------------
     case 4:
       // Battery type
       liPo = true;
       cutoffVoltage = 2.9;
-      
+
       // Board type
-      vccMv = 3300;
       battSense = false;
 
       // Vehicle address
@@ -188,16 +197,18 @@ void setupVehicle() {
       maxPWMlimited = 170;
       maxAccelerationFull = 7;
       maxAccelerationLimited = 12;
+      
+      // Steering configuration
+      steeringTorque = 255;
       break;
 
-// Vehicle ID 5 (GearGmax / KIDZTECH TOYS Porsche GT3 RS 4.0)-----------------------------------------------
+    // Vehicle ID 5 (GearGmax / KIDZTECH TOYS Porsche GT3 RS 4.0)-----------------------------------------------
     case 5:
       // Battery type
       liPo = false;
-      cutoffVoltage = 2.1;
-      
+      cutoffVoltage = 2.9;
+
       // Board type
-      vccMv = 3300;
       battSense = false;
 
       // Vehicle address
@@ -217,6 +228,9 @@ void setupVehicle() {
       maxPWMlimited = 170;
       maxAccelerationFull = 3;
       maxAccelerationLimited = 12;
+      
+      // Steering configuration
+      steeringTorque = 255;
       break;
 
   }

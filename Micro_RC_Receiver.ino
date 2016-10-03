@@ -2,7 +2,7 @@
 // ATMEL Mega 328P TQFP 32 soldered directly to the board, 8MHz external resonator,
 // 2.4GHz NRF24L01 SMD radio module, TB6612FNG dual dc motor driver
 
-// * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * *
+// * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
 const float codeVersion = 1.3; // Software revision
 
@@ -74,6 +74,9 @@ struct ackPayload {
   byte channel = 1; // the channel number
 };
 ackPayload payload;
+
+// Battery voltage detection pin
+#define BATTERY_DETECT_PIN A7 // The 20k & 10k battery detection voltage divider is connected to pin A7
 
 // Create Servo objects
 Servo servo1;
@@ -162,7 +165,7 @@ void setup() {
   //setPWMPrescaler(motor1_pwm, 1); // 123Hz = 256,  492Hz = 64, 3936Hz = 8, 31488Hz = 1
   //setPWMPrescaler(motor2_pwm, 1);
 
-  timer.setInterval(100, checkBattery); // Check battery voltage every 100ms
+  timer.setInterval(200, checkBattery); // Check battery voltage every 200ms
 }
 
 //
@@ -283,31 +286,37 @@ void driveMotors() {
     millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
   }
 
-  Motor2.drive(data.axis1, 190, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+  Motor2.drive(data.axis1, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
 }
 
 //
 // =======================================================================================================
-// CHECK RX VCC VOLTAGE (Battery is NOT monitored)
+// CHECK RX BATTERY % VCC VOLTAGES
 // =======================================================================================================
 //
 
 void checkBattery() {
+
+  // Read both averaged voltages
+  payload.batteryVoltage = batteryAverage();
   payload.vcc = vccAverage();
 
-  if (payload.vcc >= cutoffVoltage) {
-  } else {
-    payload.batteryOk = false;
+  if (battSense) { // Observe battery voltage
+    if (!payload.batteryVoltage >= cutoffVoltage) payload.batteryOk = false;
+  }
+  else { // Observe vcc voltage
+    if (!payload.vcc >= cutoffVoltage) payload.batteryOk = false;
   }
 }
 
-// Voltage averaging subfunction ----
+// Voltage read & averaging subfunctions -----------------------------------------
+// vcc ----
 float vccAverage() {
   static int raw[6];
 
   if (raw[0] == 0) {
-    for (int i = 0; i <= 6; i++) {
-      raw[i] = vccMv; // Init array with 3300mV
+    for (int i = 0; i <= 5; i++) {
+      raw[i] = readVcc(); // Init array
     }
   }
 
@@ -318,6 +327,30 @@ float vccAverage() {
   raw[1] = raw[0];
   raw[0] = readVcc();
   float average = (raw[0] + raw[1] + raw[2] + raw[3] + raw[4] + raw[5]) / 6000.0;
+  return average;
+}
+
+// battery ----
+float batteryAverage() {
+  static int raw[8];
+
+  if (!battSense) return 0;
+
+  if (raw[0] == 0) {
+    for (int i = 0; i <= 7; i++) {
+      raw[i] = analogRead(BATTERY_DETECT_PIN); // Init array
+    }
+  }
+
+  raw[7] = raw[6];
+  raw[6] = raw[5];
+  raw[5] = raw[4];
+  raw[4] = raw[3];
+  raw[3] = raw[2];
+  raw[2] = raw[1];
+  raw[1] = raw[0];
+  raw[0] = analogRead(BATTERY_DETECT_PIN);
+  float average = (raw[0] + raw[1] + raw[2] + raw[3] + raw[4] + raw[5]+ raw[6] + raw[7]) / 826.666; // 1023steps / 9.9V * 8 = 826.666
   return average;
 }
 
