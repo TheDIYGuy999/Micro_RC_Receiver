@@ -4,7 +4,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 1.3; // Software revision
+const float codeVersion = 1.4; // Software revision
 
 //
 // =======================================================================================================
@@ -25,9 +25,7 @@ const float codeVersion = 1.3; // Software revision
 #include <RF24.h> // Installed via Tools > Board > Boards Manager > Type RF24
 #include <printf.h>
 #include <Servo.h>
-#include <SimpleTimer.h> // https://github.com/jfturcot/SimpleTimer
 #include <statusLED.h> // https://github.com/TheDIYGuy999/statusLED
-
 #include <TB6612FNG.h> // https://github.com/TheDIYGuy999/TB6612FNG
 // Optional for motor PWM frequency adjustment:
 #include <PWMFrequency.h> // https://github.com/kiwisincebirth/Arduino/tree/master/libraries/PWMFrequency
@@ -49,7 +47,11 @@ const byte NRFchannel[] {
 };
 
 // the ID number of the used "radio pipe" must match with the selected ID on the transmitter!
-const uint64_t pipeIn[] = { 0xE9E8F0F0B1LL, 0xE9E8F0F0B2LL, 0xE9E8F0F0B3LL, 0xE9E8F0F0B4LL, 0xE9E8F0F0B5LL };
+// 10 ID's are available @ the moment
+const uint64_t pipeIn[] = {
+  0xE9E8F0F0B1LL, 0xE9E8F0F0B2LL, 0xE9E8F0F0B3LL, 0xE9E8F0F0B4LL, 0xE9E8F0F0B5LL,
+  0xE9E8F0F0B6LL, 0xE9E8F0F0B7LL, 0xE9E8F0F0B8LL, 0xE9E8F0F0B9LL, 0xE9E8F0F0B0LL
+};
 const int maxVehicleNumber = (sizeof(pipeIn) / (sizeof(uint64_t)));
 
 // Hardware configuration: Set up nRF24L01 radio on hardware SPI bus & pins 8 (CE) & 7 (CSN)
@@ -61,8 +63,10 @@ struct RcData {
   byte axis2; // Elevator
   byte axis3; // Throttle
   byte axis4; // Rudder
-  boolean mode1 = false; // Speed limitation
-  boolean mode2 = false;
+  boolean mode1 = false; // Mode1 (toggle speed limitation)
+  boolean mode2 = false; // Mode2 (toggle acc. / dec. limitation)
+  boolean momentary1 = false; // Momentary push button
+  byte pot1; // Potentiometer
 };
 RcData data;
 
@@ -76,7 +80,7 @@ struct ackPayload {
 ackPayload payload;
 
 // Battery voltage detection pin
-#define BATTERY_DETECT_PIN A7 // The 20k & 10k battery detection voltage divider is connected to pin A7
+#define BATTERY_DETECT_PIN A7 // The 20k (to battery) & 10k (to GND) battery detection voltage divider is connected to pin A7
 
 // Create Servo objects
 Servo servo1;
@@ -84,7 +88,10 @@ Servo servo2;
 Servo servo3;
 Servo servo4;
 
-// Initialize TB6612FNG H-Bridge
+// Special functions
+#define DIGITAL_OUT_1 1 // 1 = TXO Pin
+
+// TB6612FNG H-Bridge
 #define motor1_in1 4 // define motor pin numbers
 #define motor1_in2 9
 #define motor1_pwm 6
@@ -102,11 +109,8 @@ TB6612FNG Motor1(motor1_in1, motor1_in2, motor1_pwm, 0, 100, 6, false); // Drive
 TB6612FNG Motor2(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 2, false); // Steering motor
 
 // Status LED objects
-statusLED tailLight(false);
+statusLED tailLight(false); // "false" = output not inverted
 statusLED headLight(false);
-
-// Timer
-SimpleTimer timer;
 
 //
 // =======================================================================================================
@@ -126,8 +130,8 @@ void setup() {
   setupVehicle();
 
   // LED setup
-  if (tailLights)tailLight.begin(A1); // A1 = Servo 2 Pin
-  headLight.begin(0); // 0 = RXI Pin
+  if (tailLights) tailLight.begin(A1); // A1 = Servo 2 Pin
+  if (headLights) headLight.begin(0); // 0 = RXI Pin
 
   // Radio setup
   radio.begin();
@@ -154,18 +158,19 @@ void setup() {
   servo3.attach(A2);
   servo4.attach(A3);
 
-  // All axis to neutral position
+  // All axes to neutral position
   data.axis1 = 50;
   data.axis2 = 50;
   data.axis3 = 50;
   data.axis4 = 50;
 
+  // Special functions
+  if (TXO_momentary1) pinMode(DIGITAL_OUT_1, OUTPUT);
+
   // Motor PWM frequency (Requires the PWMFrequency.h library)
   // ----------- DOES NOT WORK WITH Mega 328P, BECAUSE millis() IS AFFECTED!! --------------
   //setPWMPrescaler(motor1_pwm, 1); // 123Hz = 256,  492Hz = 64, 3936Hz = 8, 31488Hz = 1
   //setPWMPrescaler(motor2_pwm, 1);
-
-  timer.setInterval(200, checkBattery); // Check battery voltage every 200ms
 }
 
 //
@@ -227,7 +232,7 @@ void readRadio() {
     payload.channel = NRFchannel[chPointer];
   }
 
-  if (millis() - lastRecvTime > 1000) { // bring all servos to their middle position, if no RC signal is received during 1s!
+  if (millis() - lastRecvTime > 1000) { // set all analog values to their middle position, if no RC signal is received during 1s!
     data.axis1 = 50; // Aileron (Steering for car)
     data.axis2 = 50; // Elevator
     data.axis3 = 50; // Throttle
@@ -291,21 +296,40 @@ void driveMotors() {
 
 //
 // =======================================================================================================
+// WRITE DIGITAL OUTPUTS (SPECIAL FUNCTIONS)
+// =======================================================================================================
+//
+
+void digitalOutputs() {
+  if (TXO_momentary1) { // only, if function is enabled in vehicle configuration
+    if (data.momentary1) digitalWrite(DIGITAL_OUT_1, HIGH);
+    else digitalWrite(DIGITAL_OUT_1, LOW);
+  }
+}
+
+//
+// =======================================================================================================
 // CHECK RX BATTERY % VCC VOLTAGES
 // =======================================================================================================
 //
 
 void checkBattery() {
 
-  // Read both averaged voltages
-  payload.batteryVoltage = batteryAverage();
-  payload.vcc = vccAverage();
+  // Every 2000 ms
+  static unsigned long lastTrigger;
+  if (millis() - lastTrigger >= 2000) {
+    lastTrigger = millis();
 
-  if (battSense) { // Observe battery voltage
-    if (!payload.batteryVoltage >= cutoffVoltage) payload.batteryOk = false;
-  }
-  else { // Observe vcc voltage
-    if (!payload.vcc >= cutoffVoltage) payload.batteryOk = false;
+    // Read both averaged voltages
+    payload.batteryVoltage = batteryAverage();
+    payload.vcc = vccAverage();
+
+    if (battSense) { // Observe battery voltage
+      if (!payload.batteryVoltage >= cutoffVoltage) payload.batteryOk = false;
+    }
+    else { // Observe vcc voltage
+      if (!payload.vcc >= cutoffVoltage) payload.batteryOk = false;
+    }
   }
 }
 
@@ -350,7 +374,7 @@ float batteryAverage() {
   raw[2] = raw[1];
   raw[1] = raw[0];
   raw[0] = analogRead(BATTERY_DETECT_PIN);
-  float average = (raw[0] + raw[1] + raw[2] + raw[3] + raw[4] + raw[5]+ raw[6] + raw[7]) / 826.666; // 1023steps / 9.9V * 8 = 826.666
+  float average = (raw[0] + raw[1] + raw[2] + raw[3] + raw[4] + raw[5] + raw[6] + raw[7]) / 826.666; // 1023steps / 9.9V * 8 = 826.666
   return average;
 }
 
@@ -362,9 +386,6 @@ float batteryAverage() {
 
 void loop() {
 
-  // Timer
-  timer.run();
-
   // Read radio data from transmitter
   readRadio();
 
@@ -374,7 +395,13 @@ void loop() {
   // Drive the motors
   driveMotors();
 
+  // Digital Outputs (special functions)
+  digitalOutputs();
+  
   // LED
   led();
+
+  // Battery check
+  checkBattery();
 }
 

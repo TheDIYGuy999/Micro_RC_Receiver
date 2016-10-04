@@ -10,8 +10,16 @@
 - Eagle files are also provided, if you want to build your own receiver!
 
 New in V 1.3:
-- Vehicle configuration is now stored in "vehicleConfiguration.h", so the main code always stays the same.
+- Vehicle configuration is now stored in "vehicleConfig.h", so the main code always stays the same.
 - Crude frequency hopping, if bad receiving quality is detected (needs to be improved).
+
+New in V 1.4:
+- 10 vehicle addresses instead of 5
+- More vehicle configuration options
+- The "BACK" button on the transmitter can now be used (if the menu screen is not displayed on the OLED) as a momentary button, for example for a horn on the vehicle. It is sent as "data.momentary1"
+- The "A6" potentiometer connector is now integrated in the code and is sent to the vehicle as "data.pot1"
+- SimpleTimer library replaced with my own code, which uses significantly less memory
+
 
 ## Usage
 

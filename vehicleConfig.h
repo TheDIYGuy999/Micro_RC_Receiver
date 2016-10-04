@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-const byte configID = 1; // <- Select the correct vehicle configuration ID here before uploading!
+const byte configID = 5; // <- Select the correct vehicle configuration ID here before uploading!
 
 //
 // =======================================================================================================
@@ -22,7 +22,8 @@ boolean battSense; // "true", if voltage divider resistors for battery voltage s
 int vehicleNumber; // This number must be unique for each vehicle!
 
 // Lights
-boolean tailLights; // Caution: the taillights are wired to the servo pin 2!
+boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"
+boolean headLights; // Caution: the headlights are wired to the RXI pin! -> Serial not usable, if "true"
 
 // Servo limits (45 - 135 means - 45° to 45° from the servo middle position)
 byte lim1L, lim1R; // Servo 1
@@ -39,6 +40,10 @@ byte maxAccelerationLimited;
 // Steering configuration (100% torque is 255)
 byte steeringTorque;
 
+// Additional Channels
+boolean TXO_momentary1; // The TXO output is linked to the momentary1 channel! -> Serial not usable, if "true"
+boolean potentiometer1;
+
 //
 // =======================================================================================================
 // VEHICLE SPECIFIC CONFIGURATIONS
@@ -47,7 +52,7 @@ byte steeringTorque;
 
 void setupVehicle() {
   switch (configID) {
-    // Vehicle ID 0 (generic configuration)---------------------------------------------------------------
+    // Vehicle ID 0 (generic configuration without battery sensing)--------------------------------------
     case 0:
       // Battery type
       liPo = false;
@@ -61,6 +66,7 @@ void setupVehicle() {
 
       // Lights
       tailLights = false;
+      headLights = false;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -76,6 +82,10 @@ void setupVehicle() {
 
       // Steering configuration
       steeringTorque = 255;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
       break;
 
     // Vehicle ID 1 (battery sense test)------------------------------------------------------------------
@@ -92,6 +102,7 @@ void setupVehicle() {
 
       // Lights
       tailLights = false;
+      headLights = false;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -104,9 +115,13 @@ void setupVehicle() {
       maxPWMlimited = 170;
       maxAccelerationFull = 3;
       maxAccelerationLimited = 12;
-      
+
       // Steering configuration
       steeringTorque = 255;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
       break;
 
     // Vehicle ID 2 (not in use)------------------------------------------------------------------------------
@@ -123,6 +138,7 @@ void setupVehicle() {
 
       // Lights
       tailLights = false;
+      headLights = false;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -135,9 +151,13 @@ void setupVehicle() {
       maxPWMlimited = 170;
       maxAccelerationFull = 7;
       maxAccelerationLimited = 12;
-      
+
       // Steering configuration
       steeringTorque = 255;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
       break;
 
     // Vehicle ID 3 (Maisto Mustang GT Fastback)---------------------------------------------------------------
@@ -154,6 +174,7 @@ void setupVehicle() {
 
       // Lights
       tailLights = false;
+      headLights = true;
 
       // Servo limits
       lim1L = 60; lim1R = 129;
@@ -166,9 +187,13 @@ void setupVehicle() {
       maxPWMlimited = 170;
       maxAccelerationFull = 7;
       maxAccelerationLimited = 12;
-      
+
       // Steering configuration
       steeringTorque = 255;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
       break;
 
     // Vehicle ID 4 (Maisto Dodge Challenger)-------------------------------------------------------------------
@@ -178,13 +203,14 @@ void setupVehicle() {
       cutoffVoltage = 2.9;
 
       // Board type
-      battSense = false;
+      battSense = true;
 
       // Vehicle address
       vehicleNumber = 4;
 
       // Lights
       tailLights = true;
+      headLights = true;
 
       // Servo limits
       lim1L = 120; lim1R = 55;
@@ -197,9 +223,13 @@ void setupVehicle() {
       maxPWMlimited = 170;
       maxAccelerationFull = 7;
       maxAccelerationLimited = 12;
-      
+
       // Steering configuration
       steeringTorque = 255;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
       break;
 
     // Vehicle ID 5 (GearGmax / KIDZTECH TOYS Porsche GT3 RS 4.0)-----------------------------------------------
@@ -209,13 +239,14 @@ void setupVehicle() {
       cutoffVoltage = 2.9;
 
       // Board type
-      battSense = false;
+      battSense = true;
 
       // Vehicle address
       vehicleNumber = 5;
 
       // Lights
       tailLights = false;
+      headLights = true;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -228,9 +259,13 @@ void setupVehicle() {
       maxPWMlimited = 170;
       maxAccelerationFull = 3;
       maxAccelerationLimited = 12;
-      
+
       // Steering configuration
       steeringTorque = 255;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
       break;
 
   }
