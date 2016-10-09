@@ -4,7 +4,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 1.5; // Software revision
+const float codeVersion = 1.6; // Software revision
 
 //
 // =======================================================================================================
@@ -104,6 +104,12 @@ Servo servo4;
 // Headlight off delay
 unsigned long millisLightOff = 0;
 
+// Indicators
+boolean left;
+boolean right;
+boolean hazard;
+
+
 // SYNTAX: IN1, IN2, PWM, min. input value, max. input value, neutral position width
 // invert rotation direction true or false
 TB6612FNG Motor1(motor1_in1, motor1_in2, motor1_pwm, 0, 100, 4, false); // Drive motor
@@ -112,6 +118,9 @@ TB6612FNG Motor2(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 4, false); // Steer
 // Status LED objects
 statusLED tailLight(false); // "false" = output not inverted
 statusLED headLight(false);
+statusLED indicatorL(false);
+statusLED indicatorR(false);
+
 
 //
 // =======================================================================================================
@@ -133,6 +142,10 @@ void setup() {
   // LED setup
   if (tailLights) tailLight.begin(A1); // A1 = Servo 2 Pin
   if (headLights) headLight.begin(0); // 0 = RXI Pin
+  if (indicators) {
+    indicatorL.begin(A4); // A4 = SDA Pin
+    indicatorR.begin(A5); // A5 = SCL Pin
+  }
 
   // Radio setup
   radio.begin();
@@ -196,6 +209,60 @@ void led() {
       tailLight.flash(10, 14, 0, 0); // Taillight: 10 on  / 14 off = about 40% brightness (soft PWM)
     }
   }
+
+  // Indicator lights ----
+  if (indicators) {
+    // Set and reset by lever
+    if (data.axis4 < 5) left = true;
+    if (data.axis4 > 55) left = false;
+
+    if (data.axis4 > 95) right = true;
+    if (data.axis4 < 45) right = false;
+
+    // Reset by steering
+    static int steeringOld;
+
+    if (data.axis1 > steeringOld + 10) {
+      left = false;
+      steeringOld = data.axis1;
+    }
+
+    if (data.axis1 < steeringOld - 10) {
+      right = false;
+      steeringOld = data.axis1;
+    }
+
+    // Lights
+    if (left) { // Left indicator
+      right = false;
+      indicatorL.flash(375, 375, 0, 0);
+      indicatorR.off();
+    }
+
+    if (right) { // Right indicator
+      left = false;
+      indicatorR.flash(375, 375, 0, 0);
+      indicatorL.off();
+    }
+
+    if (hazard) { // Hazard lights
+      if (left) {
+        left = false;
+        indicatorL.off();
+      }
+      if (right) {
+        right = false;
+        indicatorR.off();
+      }
+      indicatorL.flash(375, 375, 0, 0);
+      indicatorR.flash(375, 375, 0, 0);
+    }
+
+    if (!hazard && !left && !right) {
+      indicatorL.off();
+      indicatorR.off();
+    }
+  }
 }
 
 //
@@ -212,6 +279,7 @@ void readRadio() {
   if (radio.available(&pipeNo)) {
     radio.writeAckPayload(pipeNo, &payload, sizeof(struct ackPayload) );  // prepare the ACK payload
     radio.read(&data, sizeof(struct RcData)); // read the radia data and send out the ACK payload
+    hazard = false;
     lastRecvTime = millis();
 #ifdef DEBUG
     Serial.print(data.axis1);
@@ -238,6 +306,7 @@ void readRadio() {
     data.axis2 = 50; // Elevator
     data.axis3 = 50; // Throttle
     data.axis4 = 50; // Rudder
+    hazard = true;
 #ifdef DEBUG
     Serial.println("No Radio Available - Check Transmitter!");
 #endif
@@ -275,7 +344,6 @@ void driveMotors() {
     maxPWM = maxPWMfull; // Full
   }
 
-
   if (!payload.batteryOk && liPo) maxPWM = 0; // Stop the vehicle, if the battery is empty!
 
   // Acceleration & deceleration limitation (ms per 1 step input signal change)
@@ -306,13 +374,13 @@ void driveMotorsSteering() {
 
   int pwm[2];
 
-// The steering overlay
+  // The steering overlay
   int steeringFactorLeft;
   int steeringFactorRight;
   int steeringFactorLeft2;
   int steeringFactorRight2;
 
-// The input signal range
+  // The input signal range
   const int servoMin = 0;
   const int servoMax = 100;
   const int servoNeutralMin = 48;

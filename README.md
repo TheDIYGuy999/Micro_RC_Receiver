@@ -21,10 +21,16 @@ New in V 1.4:
 
 New in V 1.5:
 - Added steering mixer for semi caterpillar and caterpillar vehicles such as tanks, diggers etc.
-- Channel 1 is throttle, channel 3 is steering
+- Channel 3 is throttle, channel 1 is steering
 - More vehicle configuration options in vehicleVonfig.h
 - The left caterpillar is motor 2, the right is motor 1
-- Steering servo 1 can be used in parallel (for semi caterpillar vehicles or vehicles with electronic differential) 
+- Steering servo 1 can be used in parallel (for semi caterpillar vehicles or vehicles with electronic differential)
+
+New in V 1.6:
+- Added indicator lights - wired to A4 (SDA) / A5 (SCL) ports
+- enabled and disabled left / right by channel 4 left / right
+- disabled by turning back the steering wheel (channel 1) - just like a real car
+- hazard lights (all indicators flashing), if no connection to the transmitter
 
 ## Usage
 

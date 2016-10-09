@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-const byte configID = 2; // <- Select the correct vehicle configuration ID here before uploading!
+const byte configID = 10; // <- Select the correct vehicle configuration ID here before uploading!
 
 //
 // =======================================================================================================
@@ -27,6 +27,7 @@ byte vehicleType; // 0 = car, 1 = semi caterpillar, 2 = caterpillar
 // Lights
 boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"
 boolean headLights; // Caution: the headlights are wired to the RXI pin! -> Serial not usable, if "true"
+boolean indicators; // Caution: the indicators are wired to the SDA / SCL pins! -> I2C not usable, if "true"
 
 // Servo limits (45 - 135 means - 45° to 45° from the servo middle position)
 byte lim1L, lim1R; // Servo 1
@@ -73,6 +74,7 @@ void setupVehicle() {
       // Lights
       tailLights = false;
       headLights = false;
+      indicators = false;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -105,13 +107,14 @@ void setupVehicle() {
 
       // Vehicle address
       vehicleNumber = 1;
-      
+
       // Vehicle type
       vehicleType = 0;
 
       // Lights
       tailLights = false;
       headLights = true;
+      indicators = false;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -144,13 +147,14 @@ void setupVehicle() {
 
       // Vehicle address
       vehicleNumber = 2;
-      
+
       // Vehicle type
       vehicleType = 0;
 
       // Lights
       tailLights = false;
       headLights = true;
+      indicators = false;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -183,13 +187,14 @@ void setupVehicle() {
 
       // Vehicle address
       vehicleNumber = 3;
-      
+
       // Vehicle type
       vehicleType = 0;
 
       // Lights
       tailLights = false;
       headLights = true;
+      indicators = false;
 
       // Servo limits
       lim1L = 60; lim1R = 129;
@@ -222,13 +227,14 @@ void setupVehicle() {
 
       // Vehicle address
       vehicleNumber = 4;
-      
+
       // Vehicle type
       vehicleType = 0;
 
       // Lights
       tailLights = true;
       headLights = true;
+      indicators = false;
 
       // Servo limits
       lim1L = 120; lim1R = 55;
@@ -261,13 +267,14 @@ void setupVehicle() {
 
       // Vehicle address
       vehicleNumber = 5;
-      
+
       // Vehicle type
       vehicleType = 0;
 
       // Lights
       tailLights = false;
       headLights = true;
+      indicators = false;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -289,7 +296,7 @@ void setupVehicle() {
       potentiometer1 = true;
       break;
 
-      // Vehicle ID 10 (Caterpillar vecicle test)--------------------------------------------------------------
+    // Vehicle ID 10 (Caterpillar vecicle test)--------------------------------------------------------------
     case 10:
       // Battery type
       liPo = false;
@@ -300,13 +307,14 @@ void setupVehicle() {
 
       // Vehicle address
       vehicleNumber = 10;
-      
+
       // Vehicle type
       vehicleType = 2; // 2 = caterpillar mode
 
       // Lights
       tailLights = false;
       headLights = true;
+      indicators = true;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
