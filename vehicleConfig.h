@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-const byte configID = 5; // <- Select the correct vehicle configuration ID here before uploading!
+const byte configID = 2; // <- Select the correct vehicle configuration ID here before uploading!
 
 //
 // =======================================================================================================
@@ -20,6 +20,9 @@ boolean battSense; // "true", if voltage divider resistors for battery voltage s
 
 // Vehicle address
 int vehicleNumber; // This number must be unique for each vehicle!
+
+// Vehicle type
+byte vehicleType; // 0 = car, 1 = semi caterpillar, 2 = caterpillar
 
 // Lights
 boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"
@@ -64,6 +67,9 @@ void setupVehicle() {
       // Vehicle address
       vehicleNumber = 1;
 
+      // Vehicle type
+      vehicleType = 0;
+
       // Lights
       tailLights = false;
       headLights = false;
@@ -99,10 +105,13 @@ void setupVehicle() {
 
       // Vehicle address
       vehicleNumber = 1;
+      
+      // Vehicle type
+      vehicleType = 0;
 
       // Lights
       tailLights = false;
-      headLights = false;
+      headLights = true;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -124,21 +133,24 @@ void setupVehicle() {
       potentiometer1 = true;
       break;
 
-    // Vehicle ID 2 (not in use)------------------------------------------------------------------------------
+    // Vehicle ID 2 (95 "DINOCO")-------------------------------------------------------------------------
     case 2:
       // Battery type
       liPo = false;
       cutoffVoltage = 2.9;
 
       // Board type
-      battSense = false;
+      battSense = false; // No sensing resistors, board revision 1.0!
 
       // Vehicle address
       vehicleNumber = 2;
+      
+      // Vehicle type
+      vehicleType = 0;
 
       // Lights
       tailLights = false;
-      headLights = false;
+      headLights = true;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -167,10 +179,13 @@ void setupVehicle() {
       cutoffVoltage = 2.9;
 
       // Board type
-      battSense = false;
+      battSense = true;
 
       // Vehicle address
       vehicleNumber = 3;
+      
+      // Vehicle type
+      vehicleType = 0;
 
       // Lights
       tailLights = false;
@@ -207,6 +222,9 @@ void setupVehicle() {
 
       // Vehicle address
       vehicleNumber = 4;
+      
+      // Vehicle type
+      vehicleType = 0;
 
       // Lights
       tailLights = true;
@@ -243,6 +261,48 @@ void setupVehicle() {
 
       // Vehicle address
       vehicleNumber = 5;
+      
+      // Vehicle type
+      vehicleType = 0;
+
+      // Lights
+      tailLights = false;
+      headLights = true;
+
+      // Servo limits
+      lim1L = 45; lim1R = 135;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 3;
+      maxAccelerationLimited = 12;
+
+      // Steering configuration
+      steeringTorque = 255;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
+      break;
+
+      // Vehicle ID 10 (Caterpillar vecicle test)--------------------------------------------------------------
+    case 10:
+      // Battery type
+      liPo = false;
+      cutoffVoltage = 2.9;
+
+      // Board type
+      battSense = false;
+
+      // Vehicle address
+      vehicleNumber = 10;
+      
+      // Vehicle type
+      vehicleType = 2; // 2 = caterpillar mode
 
       // Lights
       tailLights = false;

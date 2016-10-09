@@ -4,7 +4,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 1.4; // Software revision
+const float codeVersion = 1.5; // Software revision
 
 //
 // =======================================================================================================
@@ -33,6 +33,7 @@ const float codeVersion = 1.4; // Software revision
 // Tabs (header files in sketch directory)
 #include "readVCC.h"
 #include "vehicleConfig.h"
+#include "steeringCurves.h"
 
 //
 // =======================================================================================================
@@ -105,8 +106,8 @@ unsigned long millisLightOff = 0;
 
 // SYNTAX: IN1, IN2, PWM, min. input value, max. input value, neutral position width
 // invert rotation direction true or false
-TB6612FNG Motor1(motor1_in1, motor1_in2, motor1_pwm, 0, 100, 6, false); // Drive motor
-TB6612FNG Motor2(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 2, false); // Steering motor
+TB6612FNG Motor1(motor1_in1, motor1_in2, motor1_pwm, 0, 100, 4, false); // Drive motor
+TB6612FNG Motor2(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 4, false); // Steering motor
 
 // Status LED objects
 statusLED tailLight(false); // "false" = output not inverted
@@ -258,7 +259,7 @@ void writeServos() {
 
 //
 // =======================================================================================================
-// DRIVE MOTORS
+// DRIVE MOTORS (one motor for driving, one for steering)
 // =======================================================================================================
 //
 
@@ -273,6 +274,7 @@ void driveMotors() {
   } else {
     maxPWM = maxPWMfull; // Full
   }
+
 
   if (!payload.batteryOk && liPo) maxPWM = 0; // Stop the vehicle, if the battery is empty!
 
@@ -292,6 +294,71 @@ void driveMotors() {
   }
 
   Motor2.drive(data.axis1, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+}
+
+//
+// =======================================================================================================
+// "STEERING" MOTOR DRIVING FUNCTION (throttle & steering overlay for caterpillar vehicles)
+// =======================================================================================================
+//
+
+void driveMotorsSteering() {
+
+  int pwm[2];
+
+// The steering overlay
+  int steeringFactorLeft;
+  int steeringFactorRight;
+  int steeringFactorLeft2;
+  int steeringFactorRight2;
+
+// The input signal range
+  const int servoMin = 0;
+  const int servoMax = 100;
+  const int servoNeutralMin = 48;
+  const int servoNeutralMax = 52;
+
+  // Compute steering overlay:
+  // The steering signal is channel 1 = data.axis1
+  // 100% = wheel spins with 100% of the requested speed forward
+  // -100% = wheel spins with 100% of the requested speed backward
+  if (data.axis1 <= servoNeutralMin) {
+    steeringFactorLeft = map(data.axis1, servoMin, servoNeutralMin, 0, 100);
+    steeringFactorLeft = constrain(steeringFactorLeft, 0, 100);
+  }
+  else {
+    steeringFactorLeft = 100;
+  }
+
+  if (data.axis1 >= servoNeutralMax) {
+    steeringFactorRight = map(data.axis1, servoMax, servoNeutralMax, 0, 100);
+    steeringFactorRight = constrain(steeringFactorRight, 0, 100);
+  }
+  else {
+    steeringFactorRight = 100;
+  }
+
+  // Nonlinear steering overlay correction
+  if (vehicleType == 2) {
+    steeringFactorLeft2 = reMap(curveFull, steeringFactorLeft); // Caterpillar mode
+    steeringFactorRight2 = reMap(curveFull, steeringFactorRight);
+  }
+  if (vehicleType == 1) {
+    steeringFactorLeft2 = reMap(curveSemi, steeringFactorLeft); // Semi caterpillar mode
+    steeringFactorRight2 = reMap(curveSemi, steeringFactorRight);
+  }
+
+  // Drive caterpillar motors
+  // The throttle signal (for both caterpillars) is channel 3 = data.axis3
+  // -100 to 100%
+  pwm[0] = map(data.axis3, servoMin, servoMax, 100, -100) * steeringFactorRight2 / 100;
+  pwm[1] = map(data.axis3, servoMin, servoMax, 100, -100) * steeringFactorLeft2 / 100;
+
+  pwm[0] = map(pwm[0], 100, -100, 100, 0); // convert -100 to 100% to 0-100 for motor control
+  pwm[1] = map(pwm[1], 100, -100, 100, 0);
+
+  Motor1.drive(pwm[0], 255, 0, false); // left caterpillar
+  Motor2.drive(pwm[1], 255, 0, false); // right caterpillar
 }
 
 //
@@ -393,11 +460,12 @@ void loop() {
   writeServos();
 
   // Drive the motors
-  driveMotors();
+  if (vehicleType == 0)driveMotors(); // Car
+  else driveMotorsSteering(); // Caterpillar vecicles
 
   // Digital Outputs (special functions)
   digitalOutputs();
-  
+
   // LED
   led();
 

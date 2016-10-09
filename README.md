@@ -19,6 +19,12 @@ New in V 1.4:
 - The "BACK" button on the transmitter can now be used (if the menu screen is not displayed on the OLED) as a momentary button, for example for a horn on the vehicle. It is sent as "data.momentary1"
 - SimpleTimer library replaced with my own code, which uses significantly less memory
 
+New in V 1.5:
+- Added steering mixer for semi caterpillar and caterpillar vehicles such as tanks, diggers etc.
+- Channel 1 is throttle, channel 3 is steering
+- More vehicle configuration options in vehicleVonfig.h
+- The left caterpillar is motor 2, the right is motor 1
+- Steering servo 1 can be used in parallel (for semi caterpillar vehicles or vehicles with electronic differential) 
 
 ## Usage
 
