@@ -4,7 +4,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 1.6; // Software revision
+const float codeVersion = 1.61; // Software revision
 
 //
 // =======================================================================================================
@@ -425,6 +425,11 @@ void driveMotorsSteering() {
   pwm[0] = map(pwm[0], 100, -100, 100, 0); // convert -100 to 100% to 0-100 for motor control
   pwm[1] = map(pwm[1], 100, -100, 100, 0);
 
+  if (!payload.batteryOk && liPo) { // Both motors off, if LiPo battery is empty!
+    pwm[0] = 0;
+    pwm[1] = 0;
+  }
+
   Motor1.drive(pwm[0], 255, 0, false); // left caterpillar
   Motor2.drive(pwm[1], 255, 0, false); // right caterpillar
 }
@@ -444,7 +449,7 @@ void digitalOutputs() {
 
 //
 // =======================================================================================================
-// CHECK RX BATTERY % VCC VOLTAGES
+// CHECK RX BATTERY & VCC VOLTAGES
 // =======================================================================================================
 //
 
@@ -460,10 +465,10 @@ void checkBattery() {
     payload.vcc = vccAverage();
 
     if (battSense) { // Observe battery voltage
-      if (!payload.batteryVoltage >= cutoffVoltage) payload.batteryOk = false;
+      if (payload.batteryVoltage <= cutoffVoltage) payload.batteryOk = false;
     }
     else { // Observe vcc voltage
-      if (!payload.vcc >= cutoffVoltage) payload.batteryOk = false;
+      if (payload.vcc <= cutoffVoltage) payload.batteryOk = false;
     }
   }
 }

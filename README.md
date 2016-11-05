@@ -32,6 +32,9 @@ New in V 1.6:
 - disabled by turning back the steering wheel (channel 1) - just like a real car
 - hazard lights (all indicators flashing), if no connection to the transmitter
 
+New in V 1.61:
+- Battery cutoff bug fixed
+
 ## Usage
 
 See pictures in this repo
