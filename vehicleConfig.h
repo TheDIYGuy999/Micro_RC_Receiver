@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-const byte configID = 10; // <- Select the correct vehicle configuration ID here before uploading!
+const byte configID = 4; // <- Select the correct vehicle configuration ID here before uploading!
 
 //
 // =======================================================================================================
@@ -13,7 +13,7 @@ const byte configID = 10; // <- Select the correct vehicle configuration ID here
 
 // Battery type
 boolean liPo; // If "true", the vehicle can't be reactivated once the cutoff voltage is reached
-float cutoffVoltage; // Min. battery discharge voltage
+float cutoffVoltage; // Min. battery discharge voltage, or min. VCC, if board rev. < 1.2
 
 // Board type
 boolean battSense; // "true", if voltage divider resistors for battery voltage sensing are wired to input "A7"
@@ -60,7 +60,7 @@ void setupVehicle() {
     case 0:
       // Battery type
       liPo = false;
-      cutoffVoltage = 2.9;
+      cutoffVoltage = 3.1;
 
       // Board type
       battSense = false;
@@ -100,7 +100,7 @@ void setupVehicle() {
     case 1:
       // Battery type
       liPo = true;
-      cutoffVoltage = 2.9;
+      cutoffVoltage = 3.3;
 
       // Board type
       battSense = true;
@@ -140,7 +140,7 @@ void setupVehicle() {
     case 2:
       // Battery type
       liPo = false;
-      cutoffVoltage = 2.9;
+      cutoffVoltage = 3.1;
 
       // Board type
       battSense = false; // No sensing resistors, board revision 1.0!
@@ -180,7 +180,7 @@ void setupVehicle() {
     case 3:
       // Battery type
       liPo = true;
-      cutoffVoltage = 2.9;
+      cutoffVoltage = 3.3;
 
       // Board type
       battSense = true;
@@ -220,7 +220,7 @@ void setupVehicle() {
     case 4:
       // Battery type
       liPo = true;
-      cutoffVoltage = 2.9;
+      cutoffVoltage = 3.5;
 
       // Board type
       battSense = true;
@@ -234,7 +234,7 @@ void setupVehicle() {
       // Lights
       tailLights = true;
       headLights = true;
-      indicators = false;
+      indicators = true;
 
       // Servo limits
       lim1L = 120; lim1R = 55;
@@ -243,8 +243,8 @@ void setupVehicle() {
       lim4L = 45; lim4R = 135;
 
       // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
+      maxPWMfull = 200; // = 2200U/min = 330km/h
+      maxPWMlimited = 165; // = 1700U/min = 260km/h
       maxAccelerationFull = 7;
       maxAccelerationLimited = 12;
 
@@ -260,7 +260,7 @@ void setupVehicle() {
     case 5:
       // Battery type
       liPo = false;
-      cutoffVoltage = 2.9;
+      cutoffVoltage = 3.3;
 
       // Board type
       battSense = true;
@@ -296,11 +296,51 @@ void setupVehicle() {
       potentiometer1 = true;
       break;
 
+      // Vehicle ID 6 (Coke Can Car)-----------------------------------------------
+    case 6:
+      // Battery type
+      liPo = true;
+      cutoffVoltage = 3.3;
+
+      // Board type
+      battSense = true;
+
+      // Vehicle address
+      vehicleNumber = 6;
+
+      // Vehicle type
+      vehicleType = 0;
+
+      // Lights
+      tailLights = false;
+      headLights = true;
+      indicators = false;
+
+      // Servo limits
+      lim1L = 45; lim1R = 135;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 3;
+      maxAccelerationLimited = 12;
+
+      // Steering configuration
+      steeringTorque = 160;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
+      break;
+
     // Vehicle ID 10 (Caterpillar vecicle test)--------------------------------------------------------------
     case 10:
       // Battery type
       liPo = false;
-      cutoffVoltage = 2.9;
+      cutoffVoltage = 3.1;
 
       // Board type
       battSense = false;
