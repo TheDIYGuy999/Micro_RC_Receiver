@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-const byte configID = 4; // <- Select the correct vehicle configuration ID here before uploading!
+const byte configID = 0; // <- Select the correct vehicle configuration ID here before uploading!
 
 //
 // =======================================================================================================
@@ -16,13 +16,14 @@ boolean liPo; // If "true", the vehicle can't be reactivated once the cutoff vol
 float cutoffVoltage; // Min. battery discharge voltage, or min. VCC, if board rev. < 1.2
 
 // Board type
-boolean battSense; // "true", if voltage divider resistors for battery voltage sensing are wired to input "A7"
+float boardVersion; // Board revision (MUST MATCH WITH YOUR BOARD REVISION!!)
+boolean HP; // HP = "High Power" version (both TB6612FNG channels wired in parallel) -> No motor 1, motor 2 is the driving motor
 
 // Vehicle address
 int vehicleNumber; // This number must be unique for each vehicle!
 
 // Vehicle type
-byte vehicleType; // 0 = car, 1 = semi caterpillar, 2 = caterpillar
+byte vehicleType; // 0 = car, 1 = semi caterpillar, 2 = caterpillar (0 only on HP version)
 
 // Lights
 boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"
@@ -44,6 +45,9 @@ byte maxAccelerationLimited;
 // Steering configuration (100% torque is 255)
 byte steeringTorque;
 
+// Motor 2 PWM frequency: 32 = 984Hz (default), 8 = 3936Hz, 1 = 31488Hz (only with board version. 1.3 or newer)
+byte pwmPrescaler2; // Motor 2 = steering motor (or driving motor in "HP" High Power board version)
+
 // Additional Channels
 boolean TXO_momentary1; // The TXO output is linked to the momentary1 channel! -> Serial not usable, if "true"
 boolean potentiometer1;
@@ -56,54 +60,15 @@ boolean potentiometer1;
 
 void setupVehicle() {
   switch (configID) {
-    // Vehicle ID 0 (generic configuration without battery sensing)--------------------------------------
+    // Vehicle ID 0 (generic configuration without battery sensing, board version <1.2)-------------------
     case 0:
       // Battery type
       liPo = false;
       cutoffVoltage = 3.1;
 
       // Board type
-      battSense = false;
-
-      // Vehicle address
-      vehicleNumber = 1;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = false;
-      headLights = false;
-      indicators = false;
-
-      // Servo limits
-      lim1L = 45; lim1R = 135;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 0;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-      break;
-
-    // Vehicle ID 1 (battery sense test)------------------------------------------------------------------
-    case 1:
-      // Battery type
-      liPo = true;
-      cutoffVoltage = 3.3;
-
-      // Board type
-      battSense = true;
+      boardVersion = 1.0;
+      HP = false;
 
       // Vehicle address
       vehicleNumber = 1;
@@ -114,7 +79,7 @@ void setupVehicle() {
       // Lights
       tailLights = false;
       headLights = true;
-      indicators = false;
+      indicators = true;
 
       // Servo limits
       lim1L = 45; lim1R = 135;
@@ -131,6 +96,53 @@ void setupVehicle() {
       // Steering configuration
       steeringTorque = 255;
 
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 32;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
+      break;
+
+    // Vehicle ID 1 (MECCANO standard configuration)-----------------------------------------------------
+    case 1:
+      // Battery type
+      liPo = false;
+      cutoffVoltage = 3.3;
+
+      // Board type
+      boardVersion = 1.2;
+      HP = false;
+
+      // Vehicle address
+      vehicleNumber = 1;
+
+      // Vehicle type
+      vehicleType = 0;
+
+      // Lights
+      tailLights = false;
+      headLights = true;
+      indicators = true;
+
+      // Servo limits
+      lim1L = 45; lim1R = 135;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 3;
+      maxAccelerationLimited = 12;
+
+      // Steering configuration
+      steeringTorque = 255;
+
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 32;
+
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
@@ -143,7 +155,8 @@ void setupVehicle() {
       cutoffVoltage = 3.1;
 
       // Board type
-      battSense = false; // No sensing resistors, board revision 1.0!
+      boardVersion = 1.0;
+      HP = false;
 
       // Vehicle address
       vehicleNumber = 2;
@@ -171,6 +184,9 @@ void setupVehicle() {
       // Steering configuration
       steeringTorque = 255;
 
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 32;
+
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
@@ -183,7 +199,8 @@ void setupVehicle() {
       cutoffVoltage = 3.3;
 
       // Board type
-      battSense = true;
+      boardVersion = 1.2;
+      HP = false;
 
       // Vehicle address
       vehicleNumber = 3;
@@ -211,6 +228,9 @@ void setupVehicle() {
       // Steering configuration
       steeringTorque = 255;
 
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 32;
+
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
@@ -223,7 +243,8 @@ void setupVehicle() {
       cutoffVoltage = 3.5;
 
       // Board type
-      battSense = true;
+      boardVersion = 1.3;
+      HP = true; // High Power Board!
 
       // Vehicle address
       vehicleNumber = 4;
@@ -243,13 +264,16 @@ void setupVehicle() {
       lim4L = 45; lim4R = 135;
 
       // Motor configuration
-      maxPWMfull = 200; // = 2200U/min = 330km/h
-      maxPWMlimited = 165; // = 1700U/min = 260km/h
+      maxPWMfull = 240;
+      maxPWMlimited = 170;
       maxAccelerationFull = 7;
       maxAccelerationLimited = 12;
 
       // Steering configuration
       steeringTorque = 255;
+
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 1;
 
       // Additional Channels
       TXO_momentary1 = true;
@@ -263,7 +287,8 @@ void setupVehicle() {
       cutoffVoltage = 3.3;
 
       // Board type
-      battSense = true;
+      boardVersion = 1.2;
+      HP = false;
 
       // Vehicle address
       vehicleNumber = 5;
@@ -291,19 +316,23 @@ void setupVehicle() {
       // Steering configuration
       steeringTorque = 255;
 
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 32;
+
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
       break;
 
-      // Vehicle ID 6 (Coke Can Car)-----------------------------------------------
+    // Vehicle ID 6 (Coke Can Car)-----------------------------------------------
     case 6:
       // Battery type
       liPo = true;
       cutoffVoltage = 3.3;
 
       // Board type
-      battSense = true;
+      boardVersion = 1.2;
+      HP = false;
 
       // Vehicle address
       vehicleNumber = 6;
@@ -331,6 +360,9 @@ void setupVehicle() {
       // Steering configuration
       steeringTorque = 160;
 
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 32;
+
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
@@ -343,7 +375,8 @@ void setupVehicle() {
       cutoffVoltage = 3.1;
 
       // Board type
-      battSense = false;
+      boardVersion = 1.0;
+      HP = false;
 
       // Vehicle address
       vehicleNumber = 10;
@@ -370,6 +403,9 @@ void setupVehicle() {
 
       // Steering configuration
       steeringTorque = 255;
+
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 32;
 
       // Additional Channels
       TXO_momentary1 = true;

@@ -4,7 +4,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 1.61; // Software revision
+const float codeVersion = 1.7; // Software revision
 
 //
 // =======================================================================================================
@@ -26,8 +26,7 @@ const float codeVersion = 1.61; // Software revision
 #include <printf.h>
 #include <Servo.h>
 #include <statusLED.h> // https://github.com/TheDIYGuy999/statusLED
-#include <TB6612FNG.h> // https://github.com/TheDIYGuy999/TB6612FNG
-// Optional for motor PWM frequency adjustment:
+#include <TB6612FNG.h> // https://github.com/TheDIYGuy999/TB6612FNG ***NOTE*** V1.1 required!!
 #include <PWMFrequency.h> // https://github.com/kiwisincebirth/Arduino/tree/master/libraries/PWMFrequency
 
 // Tabs (header files in sketch directory)
@@ -92,15 +91,6 @@ Servo servo4;
 // Special functions
 #define DIGITAL_OUT_1 1 // 1 = TXO Pin
 
-// TB6612FNG H-Bridge
-#define motor1_in1 4 // define motor pin numbers
-#define motor1_in2 9
-#define motor1_pwm 6
-
-#define motor2_in1 3
-#define motor2_in2 2
-#define motor2_pwm 5
-
 // Headlight off delay
 unsigned long millisLightOff = 0;
 
@@ -112,8 +102,13 @@ boolean hazard;
 
 // SYNTAX: IN1, IN2, PWM, min. input value, max. input value, neutral position width
 // invert rotation direction true or false
-TB6612FNG Motor1(motor1_in1, motor1_in2, motor1_pwm, 0, 100, 4, false); // Drive motor
-TB6612FNG Motor2(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 4, false); // Steering motor
+//TB6612FNG Motor1(motor1_in1, motor1_in2, motor1_pwm, 0, 100, 4, false); // Drive motor
+//TB6612FNG Motor2(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 4, false); // Steering motor
+
+
+// Motor objects
+TB6612FNG Motor1;
+TB6612FNG Motor2;
 
 // Status LED objects
 statusLED tailLight(false); // "false" = output not inverted
@@ -121,6 +116,77 @@ statusLED headLight(false);
 statusLED indicatorL(false);
 statusLED indicatorR(false);
 
+//
+// =======================================================================================================
+// RADIO SETUP
+// =======================================================================================================
+//
+
+void setupRadio() {
+  radio.begin();
+  radio.setChannel(NRFchannel[chPointer]);
+
+  // Set Power Amplifier (PA) level to one of four levels: RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH and RF24_PA_MAX
+  radio.setPALevel(RF24_PA_LOW);
+
+  radio.setDataRate(RF24_250KBPS);
+  radio.setAutoAck(pipeIn[vehicleNumber - 1], true); // Ensure autoACK is enabled
+  radio.enableAckPayload();
+  radio.enableDynamicPayloads();
+  radio.setRetries(5, 5);                  // 5x250us delay (blocking!!), max. 5 retries
+  //radio.setCRCLength(RF24_CRC_8);          // Use 8-bit CRC for performance
+
+#ifdef DEBUG
+  radio.printDetails();
+  delay(3000);
+#endif
+
+  radio.openReadingPipe(1, pipeIn[vehicleNumber - 1]);
+  radio.startListening();
+}
+
+//
+// =======================================================================================================
+// MOTOR DRIVER SETUP
+// =======================================================================================================
+//
+
+void setupMotors() {
+
+  // TB6612FNG H-Bridge pins
+  // ---- IMPORTANT ---- The pin assignment depends on your board revision and is switched here to match!
+  const byte motor1_in1 = 4;
+  const byte motor1_in2 = 9;
+  const byte motor1_pwm = 6;
+
+  byte motor2_in1;
+  const byte motor2_in2 = 2;
+  byte motor2_pwm;
+
+  // Switchable pins:
+  if (boardVersion >= 1.3) { // Board version >= 1.3:
+    motor2_in1 = 5;  // 5
+    motor2_pwm = 3;  // 3
+  }
+  else { // Board Version < 1.3:
+    motor2_in1 = 3;  // 3
+    motor2_pwm = 5;  // 5
+  }
+
+  // SYNTAX: IN1, IN2, PWM, min. input value, max. input value, neutral position width
+  // invert rotation direction true or false
+  Motor1.begin(motor1_in1, motor1_in2, motor1_pwm, 0, 100, 4, false); // Drive motor
+  Motor2.begin(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 4, false); // Steering motor (Drive in "HP" version)
+
+  // Motor PWM frequency prescalers (Requires the PWMFrequency.h library)
+  // Caterpillar vehicles: locked to 984Hz, to make sure, that both caterpillars use 984Hz.
+  if (vehicleType > 0) pwmPrescaler2 = 32;
+
+  // ----------- IMPORTANT!! --------------
+  // Motor 1 always runs @ 984Hz PWM frequency and can't be changed, because timers 0 an 1 are in use for other things!
+  // Motor 2 (pin 3) can be changed to the following PWM frequencies: 32 = 984Hz, 8 = 3936Hz, 1 = 31488Hz
+  setPWMPrescaler(3, pwmPrescaler2); // pin 3 is hardcoded, because we can't change all others anyway
+}
 
 //
 // =======================================================================================================
@@ -136,7 +202,7 @@ void setup() {
   delay(3000);
 #endif
 
-  // Vehicle setup
+  // Vehicle configuration setup
   setupVehicle();
 
   // LED setup
@@ -148,23 +214,7 @@ void setup() {
   }
 
   // Radio setup
-  radio.begin();
-  radio.setChannel(NRFchannel[chPointer]);
-  radio.setPALevel(RF24_PA_HIGH);
-  radio.setDataRate(RF24_250KBPS);
-  radio.setAutoAck(pipeIn[vehicleNumber - 1], true); // Ensure autoACK is enabled
-  radio.enableAckPayload();
-  radio.enableDynamicPayloads();
-  radio.setRetries(5, 5);                  // 5x250us delay (blocking!!), max. 5 retries
-  //radio.setCRCLength(RF24_CRC_8);          // Use 8-bit CRC for performance
-
-#ifdef DEBUG
-  radio.printDetails();
-  delay(3000);
-#endif
-
-  radio.openReadingPipe(1, pipeIn[vehicleNumber - 1]);
-  radio.startListening();
+  setupRadio();
 
   // Servo pins
   servo1.attach(A0);
@@ -181,10 +231,8 @@ void setup() {
   // Special functions
   if (TXO_momentary1) pinMode(DIGITAL_OUT_1, OUTPUT);
 
-  // Motor PWM frequency (Requires the PWMFrequency.h library)
-  // ----------- DOES NOT WORK WITH Mega 328P, BECAUSE millis() IS AFFECTED!! --------------
-  //setPWMPrescaler(motor1_pwm, 1); // 123Hz = 256,  492Hz = 64, 3936Hz = 8, 31488Hz = 1
-  //setPWMPrescaler(motor2_pwm, 1);
+  // Motor driver setup
+  setupMotors();
 }
 
 //
@@ -202,7 +250,7 @@ void led() {
   }
   else {
     headLight.on();
-    if (Motor1.brakeActive()) { // if braking detected from TB6612FNG motor driver
+    if (!HP && Motor1.brakeActive() || HP && Motor2.brakeActive()) { // if braking detected from TB6612FNG motor driver
       tailLight.on(); // Brake light (full brightness)
     }
     else {
@@ -311,6 +359,11 @@ void readRadio() {
     Serial.println("No Radio Available - Check Transmitter!");
 #endif
   }
+
+  if (millis() - lastRecvTime > 2000) {
+    setupRadio(); // re-initialize radio
+    lastRecvTime = millis();
+  }
 }
 
 //
@@ -357,11 +410,18 @@ void driveMotors() {
   // SYNTAX: Input value, max PWM, ramptime in ms per 1 PWM increment
   // false = brake in neutral position inactive
 
-  if (Motor1.drive(data.axis3, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
-    millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
-  }
+  if (!HP) { // Two channel version: ----
+    if (Motor1.drive(data.axis3, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
+      millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
+    }
 
-  Motor2.drive(data.axis1, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+    Motor2.drive(data.axis1, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+  }
+  else { // High Power "HP" version. Motor 2 is the dirving motor, no motor 1: ----
+    if (Motor2.drive(data.axis3, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
+      millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
+    }
+  }
 }
 
 //
@@ -453,7 +513,12 @@ void digitalOutputs() {
 // =======================================================================================================
 //
 
+boolean battSense;
+
 void checkBattery() {
+
+  if (boardVersion < 1.2) battSense = false;
+  else battSense = true;
 
   // Every 2000 ms
   static unsigned long lastTrigger;
