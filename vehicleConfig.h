@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-const byte configID = 0; // <- Select the correct vehicle configuration ID here before uploading!
+const byte configID = 7; // <- Select the correct vehicle configuration ID here before uploading!
 
 //
 // =======================================================================================================
@@ -13,7 +13,7 @@ const byte configID = 0; // <- Select the correct vehicle configuration ID here 
 
 // Battery type
 boolean liPo; // If "true", the vehicle can't be reactivated once the cutoff voltage is reached
-float cutoffVoltage; // Min. battery discharge voltage, or min. VCC, if board rev. < 1.2
+float cutoffVoltage; // Min. battery discharge voltage, or min. VCC, if board rev. < 1.2 (3.6V for LiPo, 1.1 per NiMh cell)
 
 // Board type
 float boardVersion; // Board revision (MUST MATCH WITH YOUR BOARD REVISION!!)
@@ -64,7 +64,7 @@ void setupVehicle() {
     case 0:
       // Battery type
       liPo = false;
-      cutoffVoltage = 3.1;
+      cutoffVoltage = 3.1; // trigger, as soon as VCC drops! (no battery sensing)
 
       // Board type
       boardVersion = 1.0;
@@ -152,7 +152,7 @@ void setupVehicle() {
     case 2:
       // Battery type
       liPo = false;
-      cutoffVoltage = 3.1;
+      cutoffVoltage = 3.1; // trigger, as soon as VCC drops! (no battery sensing)
 
       // Board type
       boardVersion = 1.0;
@@ -196,7 +196,7 @@ void setupVehicle() {
     case 3:
       // Battery type
       liPo = true;
-      cutoffVoltage = 3.3;
+      cutoffVoltage = 3.6;
 
       // Board type
       boardVersion = 1.2;
@@ -240,7 +240,7 @@ void setupVehicle() {
     case 4:
       // Battery type
       liPo = true;
-      cutoffVoltage = 3.5;
+      cutoffVoltage = 3.6;
 
       // Board type
       boardVersion = 1.3;
@@ -291,7 +291,7 @@ void setupVehicle() {
       HP = false;
 
       // Vehicle address
-      vehicleNumber = 5;
+      vehicleNumber = 2;
 
       // Vehicle type
       vehicleType = 0;
@@ -324,11 +324,11 @@ void setupVehicle() {
       potentiometer1 = true;
       break;
 
-    // Vehicle ID 6 (Coke Can Car)-----------------------------------------------
+    // Vehicle ID 6 (Coke Can Car)---------------------------------------------------------------------------------
     case 6:
       // Battery type
       liPo = true;
-      cutoffVoltage = 3.3;
+      cutoffVoltage = 3.6;
 
       // Board type
       boardVersion = 1.2;
@@ -368,11 +368,55 @@ void setupVehicle() {
       potentiometer1 = true;
       break;
 
+      // Vehicle ID 7 (KD-Summit S600 RC Truggy)-------------------------------------------------------------------
+    case 7:
+      // Battery type
+      liPo = true;
+      cutoffVoltage = 3.6;
+
+      // Board type
+      boardVersion = 1.3;
+      HP = true; // High Power Board!
+
+      // Vehicle address
+      vehicleNumber = 7;
+
+      // Vehicle type
+      vehicleType = 0;
+
+      // Lights
+      tailLights = false;
+      headLights = false;
+      indicators = false;
+
+      // Servo limits
+      lim1L = 130; lim1R = 50; // Direction inverted!
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 7;
+      maxAccelerationLimited = 12;
+
+      // Steering configuration
+      steeringTorque = 255;
+
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 8; // 3936Hz
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
+      break;
+
     // Vehicle ID 10 (Caterpillar vecicle test)--------------------------------------------------------------
     case 10:
       // Battery type
       liPo = false;
-      cutoffVoltage = 3.1;
+      cutoffVoltage = 3.1; // trigger, as soon as VCC drops! (no battery sensing)
 
       // Board type
       boardVersion = 1.0;

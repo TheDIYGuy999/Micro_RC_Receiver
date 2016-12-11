@@ -4,7 +4,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 1.7; // Software revision
+const float codeVersion = 1.71; // Software revision
 
 //
 // =======================================================================================================
@@ -99,12 +99,8 @@ boolean left;
 boolean right;
 boolean hazard;
 
-
-// SYNTAX: IN1, IN2, PWM, min. input value, max. input value, neutral position width
-// invert rotation direction true or false
-//TB6612FNG Motor1(motor1_in1, motor1_in2, motor1_pwm, 0, 100, 4, false); // Drive motor
-//TB6612FNG Motor2(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 4, false); // Steering motor
-
+// Motors
+boolean isDriving; // is the vehicle driving?
 
 // Motor objects
 TB6612FNG Motor1;
@@ -127,7 +123,7 @@ void setupRadio() {
   radio.setChannel(NRFchannel[chPointer]);
 
   // Set Power Amplifier (PA) level to one of four levels: RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH and RF24_PA_MAX
-  radio.setPALevel(RF24_PA_LOW);
+  radio.setPALevel(RF24_PA_LOW); // HIGH
 
   radio.setDataRate(RF24_250KBPS);
   radio.setAutoAck(pipeIn[vehicleNumber - 1], true); // Ensure autoACK is enabled
@@ -354,7 +350,8 @@ void readRadio() {
     data.axis2 = 50; // Elevator
     data.axis3 = 50; // Throttle
     data.axis4 = 50; // Rudder
-    hazard = true;
+    hazard = true; // Enable hazard lights
+    payload.batteryOk = true; // Clear low battery alert (allows to re-enable the vehicle, if you switch off the transmitter)
 #ifdef DEBUG
     Serial.println("No Radio Available - Check Transmitter!");
 #endif
@@ -397,7 +394,7 @@ void driveMotors() {
     maxPWM = maxPWMfull; // Full
   }
 
-  if (!payload.batteryOk && liPo) maxPWM = 0; // Stop the vehicle, if the battery is empty!
+  if (!payload.batteryOk && liPo) data.axis3 = 50; // Stop the vehicle, if the battery is empty!
 
   // Acceleration & deceleration limitation (ms per 1 step input signal change)
   if (data.mode2) {
@@ -414,7 +411,6 @@ void driveMotors() {
     if (Motor1.drive(data.axis3, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
       millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
     }
-
     Motor2.drive(data.axis1, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
   }
   else { // High Power "HP" version. Motor 2 is the dirving motor, no motor 1: ----
@@ -492,6 +488,10 @@ void driveMotorsSteering() {
 
   Motor1.drive(pwm[0], 255, 0, false); // left caterpillar
   Motor2.drive(pwm[1], 255, 0, false); // right caterpillar
+
+  if (pwm[0] > 5 || pwm[1] > 5) {
+    millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
+  }
 }
 
 //
@@ -520,9 +520,17 @@ void checkBattery() {
   if (boardVersion < 1.2) battSense = false;
   else battSense = true;
 
-  // Every 2000 ms
+  // switch between load and no load contition
+  if (millis() - millisLightOff >= 1000) { // one s after the vehicle did stop
+    isDriving = false; // no load
+  }
+  else {
+    isDriving = true; // under load
+  }
+
+  // Every 1000 ms, take measurements
   static unsigned long lastTrigger;
-  if (millis() - lastTrigger >= 2000) {
+  if (millis() - lastTrigger >= 1000) {
     lastTrigger = millis();
 
     // Read both averaged voltages
@@ -561,25 +569,24 @@ float vccAverage() {
 
 // battery ----
 float batteryAverage() {
-  static int raw[8];
+  static int raw[6];
 
   if (!battSense) return 0;
 
   if (raw[0] == 0) {
-    for (int i = 0; i <= 7; i++) {
+    for (int i = 0; i <= 5; i++) {
       raw[i] = analogRead(BATTERY_DETECT_PIN); // Init array
     }
   }
 
-  raw[7] = raw[6];
-  raw[6] = raw[5];
   raw[5] = raw[4];
   raw[4] = raw[3];
   raw[3] = raw[2];
   raw[2] = raw[1];
   raw[1] = raw[0];
-  raw[0] = analogRead(BATTERY_DETECT_PIN);
-  float average = (raw[0] + raw[1] + raw[2] + raw[3] + raw[4] + raw[5] + raw[6] + raw[7]) / 826.666; // 1023steps / 9.9V * 8 = 826.666
+  if (isDriving) raw[0] = (analogRead(BATTERY_DETECT_PIN) + 31); // add 0.3V while driving: 1023 steps * 0.3V / 9.9V = 31
+  else raw[0] = analogRead(BATTERY_DETECT_PIN); // else take the real voltage (compensates voltage drop while driving)
+  float average = (raw[0] + raw[1] + raw[2] + raw[3] + raw[4] + raw[5]) / 619.999; // 1023steps / 9.9V * 6 = 619.999
   return average;
 }
 
@@ -601,13 +608,13 @@ void loop() {
   if (vehicleType == 0)driveMotors(); // Car
   else driveMotorsSteering(); // Caterpillar vecicles
 
+  // Battery check
+  checkBattery();
+
   // Digital Outputs (special functions)
   digitalOutputs();
 
   // LED
   led();
-
-  // Battery check
-  checkBattery();
 }
 

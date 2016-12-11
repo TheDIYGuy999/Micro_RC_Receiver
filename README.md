@@ -35,12 +35,16 @@ New in V 1.6:
 New in V 1.61:
 - Battery cutoff bug fixed
 
-New in V 1.7. (Support for board revision 1.3):
+New in V 1.7 (Support for board revision 1.3):
 - **** TB6612FNG library update to V1.1 is required! ****
 - motor driver pinout has changed in board V1.3. So we are now able to adjust the PWM frequency of motor2. This allows smooth motor operation without the typical PWM whining.
 - vehicleConfig.h changed: "boardVersion" and "HP" variables added. They allow to stay compatible with older board versions. Just select the correct configuration.
 - The new "HP" (High Power) board version has only one motor driver channel, because both TB6612FNG channels are wired in parallel. It's able to supply 2.4A (average) / 6.4A (peak) so we can use bigger motors. This is useful for models, which use a steering servo and don't need a second motor channel.'
 - automatic radio re-initialisation after signal timeout
+
+New in V 1.71
+- Battery monitoring and cutoff triggering improved. Under load, 0.3V are now added to the battery voltage to compensate the voltage drop. This allows to set the cutoff voltage to 3.6V, even with bigger loads.
+- Vehicle #7 added.
 
 ## Usage
 
