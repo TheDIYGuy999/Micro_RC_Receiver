@@ -4,7 +4,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 1.71; // Software revision
+const float codeVersion = 1.8; // Software revision
 
 //
 // =======================================================================================================
@@ -112,6 +112,9 @@ statusLED headLight(false);
 statusLED indicatorL(false);
 statusLED indicatorR(false);
 
+// Engine sound
+boolean engineOn = false;
+
 //
 // =======================================================================================================
 // RADIO SETUP
@@ -123,7 +126,7 @@ void setupRadio() {
   radio.setChannel(NRFchannel[chPointer]);
 
   // Set Power Amplifier (PA) level to one of four levels: RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH and RF24_PA_MAX
-  radio.setPALevel(RF24_PA_LOW); // HIGH
+  radio.setPALevel(RF24_PA_HIGH); // HIGH
 
   radio.setDataRate(RF24_250KBPS);
   radio.setAutoAck(pipeIn[vehicleNumber - 1], true); // Ensure autoACK is enabled
@@ -215,7 +218,7 @@ void setup() {
   // Servo pins
   servo1.attach(A0);
   if (!tailLights) servo2.attach(A1);
-  servo3.attach(A2);
+  if (!engineSound) servo3.attach(A2);
   servo4.attach(A3);
 
   // All axes to neutral position
@@ -374,6 +377,16 @@ void writeServos() {
   if (!tailLights) servo2.write(map(data.axis2, 100, 0, lim2L, lim2R) ); // 45 - 135°
   servo3.write(map(data.axis3, 100, 0, lim3L, lim3R) ); // 45 - 135°
   servo4.write(map(data.axis4, 100, 0, lim4L, lim4R) ); // 45 - 135°
+
+// Axis 2 on the joystick switches engine sound on servo channel 3 on and off!
+  if (engineSound) {
+    if (data.axis2 > 80) {
+      servo3.attach(A2); // Enable servo 3 pulse
+    }
+    if (data. axis2 < 20) {
+      servo3.detach(); // Disable servo 3 pulse = engine off signal for "TheDIYGuy999" engine simulator!
+    }
+  }
 }
 
 //

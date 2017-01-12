@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-const byte configID = 7; // <- Select the correct vehicle configuration ID here before uploading!
+const byte configID = 3; // <- Select the correct vehicle configuration ID here before uploading!
 
 //
 // =======================================================================================================
@@ -51,6 +51,9 @@ byte pwmPrescaler2; // Motor 2 = steering motor (or driving motor in "HP" High P
 // Additional Channels
 boolean TXO_momentary1; // The TXO output is linked to the momentary1 channel! -> Serial not usable, if "true"
 boolean potentiometer1;
+
+// Engine sound
+boolean engineSound; // true = a "TheDIYGuy999" engine simulator is wired to servo channel 3
 
 //
 // =======================================================================================================
@@ -102,6 +105,9 @@ void setupVehicle() {
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
+
+      // Engine sound
+      engineSound = false;
       break;
 
     // Vehicle ID 1 (MECCANO standard configuration)-----------------------------------------------------
@@ -146,6 +152,9 @@ void setupVehicle() {
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
+      
+      // Engine sound
+      engineSound = false;
       break;
 
     // Vehicle ID 2 (95 "DINOCO")-------------------------------------------------------------------------
@@ -190,17 +199,20 @@ void setupVehicle() {
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
+      
+      // Engine sound
+      engineSound = false;
       break;
 
     // Vehicle ID 3 (Maisto Mustang GT Fastback)---------------------------------------------------------------
     case 3:
       // Battery type
       liPo = true;
-      cutoffVoltage = 3.6;
+      cutoffVoltage = 3.45;
 
       // Board type
-      boardVersion = 1.2;
-      HP = false;
+      boardVersion = 1.3;
+      HP = true;
 
       // Vehicle address
       vehicleNumber = 3;
@@ -229,11 +241,14 @@ void setupVehicle() {
       steeringTorque = 255;
 
       // Motor 2 PWM frequency
-      pwmPrescaler2 = 32;
+      pwmPrescaler2 = 1; // This a show car and we don't want PWM switching noise! So, 31.5KHz frequency.
 
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
+
+      // Engine sound
+      engineSound = true;
       break;
 
     // Vehicle ID 4 (Maisto Dodge Challenger)-------------------------------------------------------------------
@@ -273,11 +288,14 @@ void setupVehicle() {
       steeringTorque = 255;
 
       // Motor 2 PWM frequency
-      pwmPrescaler2 = 1;
+      pwmPrescaler2 = 8; // 3936Hz
 
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
+      
+      // Engine sound
+      engineSound = false;
       break;
 
     // Vehicle ID 5 (GearGmax / KIDZTECH TOYS Porsche GT3 RS 4.0)-----------------------------------------------
@@ -322,6 +340,9 @@ void setupVehicle() {
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
+      
+      // Engine sound
+      engineSound = false;
       break;
 
     // Vehicle ID 6 (Coke Can Car)---------------------------------------------------------------------------------
@@ -366,9 +387,12 @@ void setupVehicle() {
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
+      
+      // Engine sound
+      engineSound = false;
       break;
 
-      // Vehicle ID 7 (KD-Summit S600 RC Truggy)-------------------------------------------------------------------
+    // Vehicle ID 7 (KD-Summit S600 RC Truggy)-------------------------------------------------------------------
     case 7:
       // Battery type
       liPo = true;
@@ -410,6 +434,56 @@ void setupVehicle() {
       // Additional Channels
       TXO_momentary1 = true;
       potentiometer1 = true;
+      
+      // Engine sound
+      engineSound = false;
+      break;
+
+    // Vehicle ID 8 (Disney Lightning McQueen 95)-------------------------------------------------------------
+    case 8:
+      // Battery type
+      liPo = false;
+      cutoffVoltage = 3.1;
+
+      // Board type
+      boardVersion = 1.0;
+      HP = false;
+
+      // Vehicle address
+      vehicleNumber = 1;
+
+      // Vehicle type
+      vehicleType = 0;
+
+      // Lights
+      tailLights = false;
+      headLights = false;
+      indicators = false;
+
+      // Servo limits
+      lim1L = 61; lim1R = 104;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 3;
+      maxAccelerationLimited = 12;
+
+      // Steering configuration
+      steeringTorque = 255;
+
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 32;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
+      
+      // Engine sound
+      engineSound = false;
       break;
 
     // Vehicle ID 10 (Caterpillar vecicle test)--------------------------------------------------------------
@@ -450,6 +524,53 @@ void setupVehicle() {
 
       // Motor 2 PWM frequency
       pwmPrescaler2 = 32;
+
+      // Additional Channels
+      TXO_momentary1 = true;
+      potentiometer1 = true;
+      
+      // Engine sound
+      engineSound = false;
+      break;
+
+    // Vehicle ID 11 (generic configuration, board v1.3)-------------------------------------------------------------------
+    case 11:
+      // Battery type
+      liPo = true;
+      cutoffVoltage = 3.6;
+
+      // Board type
+      boardVersion = 1.3;
+      HP = false;
+
+      // Vehicle address
+      vehicleNumber = 1;
+
+      // Vehicle type
+      vehicleType = 0;
+
+      // Lights
+      tailLights = false;
+      headLights = true;
+      indicators = true;
+
+      // Servo limits
+      lim1L = 45; lim1R = 135;
+      lim2L = 45; lim2R = 135;
+      lim3L = 45; lim3R = 135;
+      lim4L = 45; lim4R = 135;
+
+      // Motor configuration
+      maxPWMfull = 255;
+      maxPWMlimited = 170;
+      maxAccelerationFull = 7;
+      maxAccelerationLimited = 12;
+
+      // Steering configuration
+      steeringTorque = 255;
+
+      // Motor 2 PWM frequency
+      pwmPrescaler2 = 8; // 3936Hz
 
       // Additional Channels
       TXO_momentary1 = true;

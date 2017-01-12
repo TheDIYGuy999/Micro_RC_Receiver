@@ -46,6 +46,9 @@ New in V 1.71
 - Battery monitoring and cutoff triggering improved. Under load, 0.3V are now added to the battery voltage to compensate the voltage drop. This allows to set the cutoff voltage to 3.6V, even with bigger loads.
 - Vehicle #7 added.
 
+New in V 1.8
+- New "engineSound" variable in "vehicleconfig.h". True means, that the servo 3 pulse signal can be switched on and off, using the  channel 2 joystick. This switches the engine sound on my "Rc Engine Sound" unit on and off.
+
 ## Usage
 
 See pictures in this repo
