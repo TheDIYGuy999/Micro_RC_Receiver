@@ -27,7 +27,7 @@ const float codeVersion = 1.8; // Software revision
 #include <Servo.h>
 #include <statusLED.h> // https://github.com/TheDIYGuy999/statusLED
 #include <TB6612FNG.h> // https://github.com/TheDIYGuy999/TB6612FNG ***NOTE*** V1.1 required!!
-#include <PWMFrequency.h> // https://github.com/kiwisincebirth/Arduino/tree/master/libraries/PWMFrequency
+#include <PWMFrequency.h> // https://github.com/TheDIYGuy999/PWMFrequency
 
 // Tabs (header files in sketch directory)
 #include "readVCC.h"
