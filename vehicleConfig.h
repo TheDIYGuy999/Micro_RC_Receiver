@@ -3,57 +3,7 @@
 
 #include "Arduino.h"
 
-const byte configID = 3; // <- Select the correct vehicle configuration ID here before uploading!
-
-//
-// =======================================================================================================
-// DECLARATION OF VEHICLE SPECIFIC CONFIGURATION VARIABLES
-// =======================================================================================================
-//
-
-// Battery type
-boolean liPo; // If "true", the vehicle can't be reactivated once the cutoff voltage is reached
-float cutoffVoltage; // Min. battery discharge voltage, or min. VCC, if board rev. < 1.2 (3.6V for LiPo, 1.1 per NiMh cell)
-
-// Board type
-float boardVersion; // Board revision (MUST MATCH WITH YOUR BOARD REVISION!!)
-boolean HP; // HP = "High Power" version (both TB6612FNG channels wired in parallel) -> No motor 1, motor 2 is the driving motor
-
-// Vehicle address
-int vehicleNumber; // This number must be unique for each vehicle!
-
-// Vehicle type
-byte vehicleType; // 0 = car, 1 = semi caterpillar, 2 = caterpillar (0 only on HP version)
-
-// Lights
-boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"
-boolean headLights; // Caution: the headlights are wired to the RXI pin! -> Serial not usable, if "true"
-boolean indicators; // Caution: the indicators are wired to the SDA / SCL pins! -> I2C not usable, if "true"
-
-// Servo limits (45 - 135 means - 45° to 45° from the servo middle position)
-byte lim1L, lim1R; // Servo 1
-byte lim2L, lim2R;
-byte lim3L, lim3R;
-byte lim4L, lim4R; // Servo 4
-
-// Motor configuration
-int maxPWMfull; // (100% PWM is 255)
-int maxPWMlimited;
-byte maxAccelerationFull;// (ms per 1 step input signal change)
-byte maxAccelerationLimited;
-
-// Steering configuration (100% torque is 255)
-byte steeringTorque;
-
-// Motor 2 PWM frequency: 32 = 984Hz (default), 8 = 3936Hz, 1 = 31488Hz (only with board version. 1.3 or newer)
-byte pwmPrescaler2; // Motor 2 = steering motor (or driving motor in "HP" High Power board version)
-
-// Additional Channels
-boolean TXO_momentary1; // The TXO output is linked to the momentary1 channel! -> Serial not usable, if "true"
-boolean potentiometer1;
-
-// Engine sound
-boolean engineSound; // true = a "TheDIYGuy999" engine simulator is wired to servo channel 3
+#define CONFIG_CAMARO // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -61,523 +11,655 @@ boolean engineSound; // true = a "TheDIYGuy999" engine simulator is wired to ser
 // =======================================================================================================
 //
 
-void setupVehicle() {
-  switch (configID) {
-    // Vehicle ID 0 (generic configuration without battery sensing, board version <1.2)-------------------
-    case 0:
-      // Battery type
-      liPo = false;
-      cutoffVoltage = 3.1; // trigger, as soon as VCC drops! (no battery sensing)
-
-      // Board type
-      boardVersion = 1.0;
-      HP = false;
-
-      // Vehicle address
-      vehicleNumber = 1;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = false;
-      headLights = true;
-      indicators = true;
-
-      // Servo limits
-      lim1L = 45; lim1R = 135;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 3;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 32;
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-
-      // Engine sound
-      engineSound = false;
-      break;
-
-    // Vehicle ID 1 (MECCANO standard configuration)-----------------------------------------------------
-    case 1:
-      // Battery type
-      liPo = false;
-      cutoffVoltage = 3.3;
-
-      // Board type
-      boardVersion = 1.2;
-      HP = false;
-
-      // Vehicle address
-      vehicleNumber = 1;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = false;
-      headLights = true;
-      indicators = true;
-
-      // Servo limits
-      lim1L = 45; lim1R = 135;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 3;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 32;
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-      
-      // Engine sound
-      engineSound = false;
-      break;
-
-    // Vehicle ID 2 (95 "DINOCO")-------------------------------------------------------------------------
-    case 2:
-      // Battery type
-      liPo = false;
-      cutoffVoltage = 3.1; // trigger, as soon as VCC drops! (no battery sensing)
-
-      // Board type
-      boardVersion = 1.0;
-      HP = false;
-
-      // Vehicle address
-      vehicleNumber = 2;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = false;
-      headLights = true;
-      indicators = false;
-
-      // Servo limits
-      lim1L = 45; lim1R = 135;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 7;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 32;
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-      
-      // Engine sound
-      engineSound = false;
-      break;
-
-    // Vehicle ID 3 (Maisto Mustang GT Fastback)---------------------------------------------------------------
-    case 3:
-      // Battery type
-      liPo = true;
-      cutoffVoltage = 3.45;
-
-      // Board type
-      boardVersion = 1.3;
-      HP = true;
-
-      // Vehicle address
-      vehicleNumber = 3;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = false;
-      headLights = true;
-      indicators = false;
-
-      // Servo limits
-      lim1L = 60; lim1R = 129;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 7;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 1; // This a show car and we don't want PWM switching noise! So, 31.5KHz frequency.
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-
-      // Engine sound
-      engineSound = true;
-      break;
-
-    // Vehicle ID 4 (Maisto Dodge Challenger)-------------------------------------------------------------------
-    case 4:
-      // Battery type
-      liPo = true;
-      cutoffVoltage = 3.6;
-
-      // Board type
-      boardVersion = 1.3;
-      HP = true; // High Power Board!
-
-      // Vehicle address
-      vehicleNumber = 4;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = true;
-      headLights = true;
-      indicators = true;
-
-      // Servo limits
-      lim1L = 120; lim1R = 55;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 240;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 7;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 8; // 3936Hz
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-      
-      // Engine sound
-      engineSound = false;
-      break;
-
-    // Vehicle ID 5 (GearGmax / KIDZTECH TOYS Porsche GT3 RS 4.0)-----------------------------------------------
-    case 5:
-      // Battery type
-      liPo = false;
-      cutoffVoltage = 3.3;
-
-      // Board type
-      boardVersion = 1.2;
-      HP = false;
-
-      // Vehicle address
-      vehicleNumber = 2;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = false;
-      headLights = true;
-      indicators = false;
-
-      // Servo limits
-      lim1L = 45; lim1R = 135;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 3;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 32;
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-      
-      // Engine sound
-      engineSound = false;
-      break;
-
-    // Vehicle ID 6 (Coke Can Car)---------------------------------------------------------------------------------
-    case 6:
-      // Battery type
-      liPo = true;
-      cutoffVoltage = 3.6;
-
-      // Board type
-      boardVersion = 1.2;
-      HP = false;
-
-      // Vehicle address
-      vehicleNumber = 6;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = false;
-      headLights = true;
-      indicators = false;
-
-      // Servo limits
-      lim1L = 45; lim1R = 135;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 3;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 160;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 32;
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-      
-      // Engine sound
-      engineSound = false;
-      break;
-
-    // Vehicle ID 7 (KD-Summit S600 RC Truggy)-------------------------------------------------------------------
-    case 7:
-      // Battery type
-      liPo = true;
-      cutoffVoltage = 3.6;
-
-      // Board type
-      boardVersion = 1.3;
-      HP = true; // High Power Board!
-
-      // Vehicle address
-      vehicleNumber = 7;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = false;
-      headLights = false;
-      indicators = false;
-
-      // Servo limits
-      lim1L = 130; lim1R = 50; // Direction inverted!
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 7;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 8; // 3936Hz
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-      
-      // Engine sound
-      engineSound = false;
-      break;
-
-    // Vehicle ID 8 (Disney Lightning McQueen 95)-------------------------------------------------------------
-    case 8:
-      // Battery type
-      liPo = false;
-      cutoffVoltage = 3.1;
-
-      // Board type
-      boardVersion = 1.0;
-      HP = false;
-
-      // Vehicle address
-      vehicleNumber = 1;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = false;
-      headLights = false;
-      indicators = false;
-
-      // Servo limits
-      lim1L = 61; lim1R = 104;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 3;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 32;
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-      
-      // Engine sound
-      engineSound = false;
-      break;
-
-    // Vehicle ID 10 (Caterpillar vecicle test)--------------------------------------------------------------
-    case 10:
-      // Battery type
-      liPo = false;
-      cutoffVoltage = 3.1; // trigger, as soon as VCC drops! (no battery sensing)
-
-      // Board type
-      boardVersion = 1.0;
-      HP = false;
-
-      // Vehicle address
-      vehicleNumber = 10;
-
-      // Vehicle type
-      vehicleType = 2; // 2 = caterpillar mode
-
-      // Lights
-      tailLights = false;
-      headLights = true;
-      indicators = true;
-
-      // Servo limits
-      lim1L = 45; lim1R = 135;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 3;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 32;
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-      
-      // Engine sound
-      engineSound = false;
-      break;
-
-    // Vehicle ID 11 (generic configuration, board v1.3)-------------------------------------------------------------------
-    case 11:
-      // Battery type
-      liPo = true;
-      cutoffVoltage = 3.6;
-
-      // Board type
-      boardVersion = 1.3;
-      HP = false;
-
-      // Vehicle address
-      vehicleNumber = 1;
-
-      // Vehicle type
-      vehicleType = 0;
-
-      // Lights
-      tailLights = false;
-      headLights = true;
-      indicators = true;
-
-      // Servo limits
-      lim1L = 45; lim1R = 135;
-      lim2L = 45; lim2R = 135;
-      lim3L = 45; lim3R = 135;
-      lim4L = 45; lim4R = 135;
-
-      // Motor configuration
-      maxPWMfull = 255;
-      maxPWMlimited = 170;
-      maxAccelerationFull = 7;
-      maxAccelerationLimited = 12;
-
-      // Steering configuration
-      steeringTorque = 255;
-
-      // Motor 2 PWM frequency
-      pwmPrescaler2 = 8; // 3936Hz
-
-      // Additional Channels
-      TXO_momentary1 = true;
-      potentiometer1 = true;
-      break;
-
-  }
-}
+/*
+  // Battery type
+  boolean liPo; // If "true", the vehicle can't be reactivated once the cutoff voltage is reached
+  float cutoffVoltage; // Min. battery discharge voltage, or min. VCC, if board rev. < 1.2 (3.6V for LiPo, 1.1 per NiMh cell)
+
+  // Board type
+  float boardVersion; // Board revision (MUST MATCH WITH YOUR BOARD REVISION!!)
+  boolean HP; // HP = "High Power" version (both TB6612FNG channels wired in parallel) -> No motor 1, motor 2 is the driving motor
+
+  // Vehicle address
+  int vehicleNumber; // This number must be unique for each vehicle!
+
+  // Vehicle type
+  byte vehicleType; // 0 = car, 1 = semi caterpillar, 2 = caterpillar (0 only on HP version)
+
+  // Lights
+  boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"
+  boolean headLights; // Caution: the headlights are wired to the RXI pin! -> Serial not usable, if "true"
+  boolean indicators; // Caution: the indicators are wired to the SDA / SCL pins! -> I2C not usable, if "true"
+
+  // Servo limits (45 - 135 means - 45° to 45° from the servo middle position)
+  byte lim1L, lim1R; // Servo 1
+  byte lim2L, lim2R;
+  byte lim3L, lim3R;
+  byte lim4L, lim4R; // Servo 4
+
+  // Motor configuration
+  int maxPWMfull; // (100% PWM is 255)
+  int maxPWMlimited;
+  byte maxAccelerationFull;// (ms per 1 step input signal change)
+  byte maxAccelerationLimited;
+
+  // Steering configuration (100% torque is 255)
+  byte steeringTorque;
+
+  // Motor 2 PWM frequency: 32 = 984Hz (default), 8 = 3936Hz, 1 = 31488Hz (only with board version. 1.3 or newer)
+  byte pwmPrescaler2; // Motor 2 = steering motor (or driving motor in "HP" High Power board version)
+
+  // Additional Channels
+  boolean TXO_momentary1; // The TXO output is linked to the momentary1 channel! -> Serial not usable, if "true"
+  boolean potentiometer1;
+
+  // Engine sound
+  boolean engineSound; // true = a "TheDIYGuy999" engine simulator is wired to servo channel 3
+*/
+
+// Generic configuration, board v1.0-------------------------------------------------------------------------
+#ifdef CONFIG_GENERIC_V10
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 3.1; // trigger, as soon as VCC drops! (no battery sensing)
+
+// Board type
+float boardVersion = 1.0;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 1;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 3;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+#endif
+
+// MECCANO V1.2 standard configuration-----------------------------------------------------------------
+#ifdef CONFIG_MECCANO_V12
+// Battery type
+boolean liPo = false;
+boolean cutoffVoltage = 3.3;
+
+// Board type
+float boardVersion = 1.2;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 1;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int maxAccelerationFull = 3;
+int maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+#endif
+
+// Generic configuration, board v1.3-------------------------------------------------------------------
+#ifdef CONFIG_GENERIC_V13
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.6;
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 1;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+#endif
+
+// Disney Lightning McQueen 95----------------------------------------------------------------------
+#ifdef CONFIG_MC_QUEEN
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 3.1; // trigger, as soon as VCC drops! (no battery sensing)
+
+// Board type
+float boardVersion = 1.0;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 1;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+
+// Servo limits
+byte lim1L = 61, lim1R = 104;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 3;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+#endif
+
+// Disney 95 "DINOCO"--------------------------------------------------------------------------------
+#ifdef CONFIG_DINOCO
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 3.1; // trigger, as soon as VCC drops! (no battery sensing)
+
+// Board type
+float boardVersion = 1.0;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 2;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+#endif
+
+// Maisto Mustang GT Fastback---------------------------------------------------------------------------
+#ifdef CONFIG_MUSTANG
+// Battery type
+boolean liPo = true;
+float  = 3.45;
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = true;
+
+// Vehicle address
+int vehicleNumber = 3;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+
+// Servo limits
+byte lim1L = 60, lim1R = 129;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 1; // This a show car and we don't want PWM switching noise! So, 31.5KHz frequency.
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = true;
+#endif
+
+// Maisto Dodge Challenger----------------------------------------------------------------------------
+#ifdef CONFIG_CHALLENGER
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.6;
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = true; // High Power Board!
+
+// Vehicle address
+int vehicleNumber = 4;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = true;
+boolean headLights = true;
+boolean indicators = true;
+
+// Servo limits
+byte lim1L = 120, lim1R = 55;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 240; // still a bit limited, but fast as hell!
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+#endif
+
+// GearGmax / KIDZTECH TOYS Porsche GT3 RS 4.0--------------------------------------------------------
+#ifdef CONFIG_PORSCHE
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 3.3;
+
+// Board type
+float boardVersion = 1.2;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 5; // one car number 2 and one number 5!
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 3;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+#endif
+
+// Coke Can Car--------------------------------------------------------------------------------------
+#ifdef CONFIG_CCC
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.6;
+
+// Board type
+float boardVersion = 1.2;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 6;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 3;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 160;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+#endif
+
+// KD-Summit S600 RC Truggy-------------------------------------------------------------------------
+#ifdef CONFIG_KD_SUMMIT
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.6;
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = true; // High Power Board!
+
+// Vehicle address
+int vehicleNumber = 7;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+
+// Servo limits
+byte lim1L = 130, lim1R = 50; // Direction inverted!
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+#endif
+
+// Maisto Chevy Camaro---------------------------------------------------------------------------
+#ifdef CONFIG_CAMARO
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.45;
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 8;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 1; // We don't want PWM switching noise from the steering! So, 31.5KHz frequency.
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+#endif
+
+// 1:18 LaFerrari-------------------------------------------------------------------------
+#ifdef CONFIG_LAFERRARI
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 3.45;
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 9;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 1; // We don't want PWM switching noise from the steering! So, 31.5KHz frequency.
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+#endif
+
+// Caterpillar test vehicle-----------------------------------------------------------------------
+#ifdef CONFIG_CATERPILLAR_TEST
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 3.1; cutoffVoltage
+
+// Board type
+float boardVersion = 1.0;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 10;
+
+// Vehicle type
+byte vehicleType = 2; // 2 = caterpillar mode
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 3;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+#endif
 
 #endif

@@ -49,6 +49,9 @@ New in V 1.71
 New in V 1.8
 - New "engineSound" variable in "vehicleconfig.h". True means, that the servo 3 pulse signal can be switched on and off, using the  channel 2 joystick. This switches the engine sound on my "Rc Engine Sound" unit on and off.
 
+New in V 1.9
+- New vehicle specific configuration section in vehicleConfig.h. The configuration is now done entirely during compilation time.
+
 ## Usage
 
 See pictures in this repo

@@ -4,7 +4,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 1.8; // Software revision
+const float codeVersion = 1.9; // Software revision
 
 //
 // =======================================================================================================
@@ -200,9 +200,6 @@ void setup() {
   printf_begin();
   delay(3000);
 #endif
-
-  // Vehicle configuration setup
-  setupVehicle();
 
   // LED setup
   if (tailLights) tailLight.begin(A1); // A1 = Servo 2 Pin
