@@ -4,7 +4,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 1.9; // Software revision
+const float codeVersion = 2.0; // Software revision
 
 //
 // =======================================================================================================
@@ -111,6 +111,7 @@ statusLED tailLight(false); // "false" = output not inverted
 statusLED headLight(false);
 statusLED indicatorL(false);
 statusLED indicatorR(false);
+statusLED beaconLights(false);
 
 // Engine sound
 boolean engineOn = false;
@@ -179,7 +180,7 @@ void setupMotors() {
 
   // Motor PWM frequency prescalers (Requires the PWMFrequency.h library)
   // Caterpillar vehicles: locked to 984Hz, to make sure, that both caterpillars use 984Hz.
-  if (vehicleType > 0) pwmPrescaler2 = 32;
+  if (vehicleType > 0 && vehicleType < 3) pwmPrescaler2 = 32;
 
   // ----------- IMPORTANT!! --------------
   // Motor 1 always runs @ 984Hz PWM frequency and can't be changed, because timers 0 an 1 are in use for other things!
@@ -208,6 +209,7 @@ void setup() {
     indicatorL.begin(A4); // A4 = SDA Pin
     indicatorR.begin(A5); // A5 = SCL Pin
   }
+  if (beacons) beaconLights.begin(A3); // A3 = Servo 4 Pin
 
   // Radio setup
   setupRadio();
@@ -216,7 +218,7 @@ void setup() {
   servo1.attach(A0);
   if (!tailLights) servo2.attach(A1);
   if (!engineSound) servo3.attach(A2);
-  servo4.attach(A3);
+  if (!beacons) servo4.attach(A3);
 
   // All axes to neutral position
   data.axis1 = 50;
@@ -243,6 +245,7 @@ void led() {
   if (millis() - millisLightOff >= 10000) {
     headLight.off(); // Headlight off
     tailLight.off(); // Taillight off
+    beaconLights.off(); // Beacons off
   }
   else {
     headLight.on();
@@ -252,6 +255,7 @@ void led() {
     else {
       tailLight.flash(10, 14, 0, 0); // Taillight: 10 on  / 14 off = about 40% brightness (soft PWM)
     }
+    beaconLights.flash(50, 650, 0, 0); // Simulate rotating beacon lights with short flashes
   }
 
   // Indicator lights ----
@@ -373,9 +377,9 @@ void writeServos() {
   servo1.write(map(data.axis1, 100, 0, lim1L, lim1R) ); // 45 - 135°
   if (!tailLights) servo2.write(map(data.axis2, 100, 0, lim2L, lim2R) ); // 45 - 135°
   servo3.write(map(data.axis3, 100, 0, lim3L, lim3R) ); // 45 - 135°
-  servo4.write(map(data.axis4, 100, 0, lim4L, lim4R) ); // 45 - 135°
+  if (!beacons) servo4.write(map(data.axis4, 100, 0, lim4L, lim4R) ); // 45 - 135°
 
-// Axis 2 on the joystick switches engine sound on servo channel 3 on and off!
+  // Axis 2 on the joystick switches engine sound on servo channel 3 on and off!
   if (engineSound) {
     if (data.axis2 > 80) {
       servo3.attach(A2); // Enable servo 3 pulse
@@ -388,11 +392,11 @@ void writeServos() {
 
 //
 // =======================================================================================================
-// DRIVE MOTORS (one motor for driving, one for steering)
+// DRIVE MOTORS CAR (for cars, one motor for driving, one for steering)
 // =======================================================================================================
 //
 
-void driveMotors() {
+void driveMotorsCar() {
 
   int maxPWM;
   byte maxAcceleration;
@@ -428,6 +432,45 @@ void driveMotors() {
       millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
     }
   }
+}
+
+//
+// =======================================================================================================
+// DRIVE MOTORS FORKLIFT (for forklifts, one motor for driving, one for lifting)
+// =======================================================================================================
+//
+
+void driveMotorsForklift() {
+
+  int maxPWM;
+  byte maxAcceleration;
+
+  // Speed limitation (max. is 255)
+  if (data.mode1) {
+    maxPWM = maxPWMlimited; // Limited
+  } else {
+    maxPWM = maxPWMfull; // Full
+  }
+
+  if (!payload.batteryOk && liPo) data.axis3 = 50; // Stop the vehicle, if the battery is empty!
+
+  // Acceleration & deceleration limitation (ms per 1 step input signal change)
+  if (data.mode2) {
+    maxAcceleration = maxAccelerationLimited; // Limited
+  } else {
+    maxAcceleration = maxAccelerationFull; // Full
+  }
+
+  // ***************** Note! The ramptime is intended to protect the gearbox! *******************
+  // SYNTAX: Input value, max PWM, ramptime in ms per 1 PWM increment
+  // false = brake in neutral position inactive
+
+
+  if (Motor1.drive(data.axis3, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
+    millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
+  }
+  Motor2.drive(data.axis2, steeringTorque, 0, false); // The fork lifting motor (the steering is driven by servo 1)
+
 }
 
 //
@@ -615,8 +658,9 @@ void loop() {
   writeServos();
 
   // Drive the motors
-  if (vehicleType == 0)driveMotors(); // Car
-  else driveMotorsSteering(); // Caterpillar vecicles
+  if (vehicleType == 0)driveMotorsCar(); // Car
+  else if (vehicleType == 3)driveMotorsForklift(); // Forklift
+  else driveMotorsSteering(); // Caterpillar and half caterpillar vecicles
 
   // Battery check
   checkBattery();

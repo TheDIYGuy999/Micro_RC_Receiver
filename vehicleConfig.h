@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_CAMARO // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_FORKLIFT // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -24,12 +24,13 @@
   int vehicleNumber; // This number must be unique for each vehicle!
 
   // Vehicle type
-  byte vehicleType; // 0 = car, 1 = semi caterpillar, 2 = caterpillar (0 only on HP version)
+  byte vehicleType; // 0 = car, 1 = semi caterpillar, 2 = caterpillar , 3 = forklift (Type 0 only is supported on "HP" version)
 
   // Lights
   boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"
   boolean headLights; // Caution: the headlights are wired to the RXI pin! -> Serial not usable, if "true"
   boolean indicators; // Caution: the indicators are wired to the SDA / SCL pins! -> I2C not usable, if "true"
+  boolean beacons; // Caution: the beacons are wired to the servo pin 4! -> Servo 4 not usable, if "true"
 
   // Servo limits (45 - 135 means - 45° to 45° from the servo middle position)
   byte lim1L, lim1R; // Servo 1
@@ -77,6 +78,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 45, lim1R = 135;
@@ -124,6 +126,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 45, lim1R = 135;
@@ -171,6 +174,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 45, lim1R = 135;
@@ -215,6 +219,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = false;
 boolean indicators = false;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 61, lim1R = 104;
@@ -262,6 +267,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 45, lim1R = 135;
@@ -309,6 +315,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 60, lim1R = 129;
@@ -356,6 +363,7 @@ byte vehicleType = 0;
 boolean tailLights = true;
 boolean headLights = true;
 boolean indicators = true;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 120, lim1R = 55;
@@ -403,6 +411,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 45, lim1R = 135;
@@ -437,7 +446,7 @@ boolean liPo = true;
 float cutoffVoltage = 3.6;
 
 // Board type
-float boardVersion = 1.2;
+float boardVersion = 1.3;
 boolean HP = false;
 
 // Vehicle address
@@ -450,6 +459,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 45, lim1R = 135;
@@ -467,7 +477,7 @@ byte maxAccelerationLimited = 12;
 byte steeringTorque = 160;
 
 // Motor 2 PWM frequency
-byte pwmPrescaler2 = 32;
+byte pwmPrescaler2 = 1; // We don't want PWM switching noise from the steering! So, 31.5KHz frequency.
 
 // Additional Channels
 boolean TXO_momentary1 = true;
@@ -497,6 +507,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = false;
 boolean indicators = false;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 130, lim1R = 50; // Direction inverted!
@@ -544,6 +555,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 45, lim1R = 135;
@@ -575,10 +587,10 @@ boolean engineSound = false;
 #ifdef CONFIG_LAFERRARI
 // Battery type
 boolean liPo = false;
-float cutoffVoltage = 3.45;
+float cutoffVoltage = 4.4; // 4 NiMh cells
 
 // Board type
-float boardVersion = 1.3;
+float boardVersion = 1.2;
 boolean HP = false;
 
 // Vehicle address
@@ -591,6 +603,7 @@ byte vehicleType = 0;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 45, lim1R = 135;
@@ -608,11 +621,63 @@ byte maxAccelerationLimited = 12;
 byte steeringTorque = 255;
 
 // Motor 2 PWM frequency
-byte pwmPrescaler2 = 1; // We don't want PWM switching noise from the steering! So, 31.5KHz frequency.
+byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+#endif
+
+// Rui Chuang Forklift-------------------------------------------------------------------------
+#ifdef CONFIG_FORKLIFT
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 4.4; // 4 Eneloop cells
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 10;
+
+// Vehicle type
+byte vehicleType = 3; // Forklift mode
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+boolean beacons = true;
+
+// Servo limits
+byte lim1L = 145, lim1R = 35;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration (lift in this case)
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
 #endif
 
 // Caterpillar test vehicle-----------------------------------------------------------------------
@@ -635,6 +700,7 @@ byte vehicleType = 2; // 2 = caterpillar mode
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
+boolean beacons = false;
 
 // Servo limits
 byte lim1L = 45, lim1R = 135;

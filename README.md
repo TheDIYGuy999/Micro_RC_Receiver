@@ -52,6 +52,11 @@ New in V 1.8
 New in V 1.9
 - New vehicle specific configuration section in vehicleConfig.h. The configuration is now done entirely during compilation time.
 
+New in V 2.0
+- vehicle Config.h: New vehicleType 3 (forklift) added. Motor 2 is used as lifting motor in this case. A servo is required as steering motor.
+- Beacon lights can be wired to servo channel 4. Select "beacons = true" in this case. The beacons are flashing during vehicle movement and are switching off, after the vehicle did not move for 10s.
+
+
 ## Usage
 
 See pictures in this repo
