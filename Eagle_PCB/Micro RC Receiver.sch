@@ -10979,13 +10979,13 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <text x="335.28" y="246.38" size="1.778" layer="91">RC servo outputs</text>
 <text x="291.592" y="8.382" size="2.54" layer="91">2.4GHz Receiver with 4
 servo outputs and dual
-DC motor driver V1.3</text>
-<text x="213.36" y="12.7" size="1.778" layer="91">Designed July - Nov. 2016
+DC motor driver V1.4</text>
+<text x="203.2" y="12.7" size="1.778" layer="91">Designed July 2016 - Feb. 2017
 by TheDIYGuy999</text>
 <text x="340.36" y="68.58" size="1.778" layer="91">Serial Header</text>
 <text x="340.36" y="96.52" size="1.778" layer="91">ICSP Header</text>
 <text x="340.36" y="45.72" size="1.778" layer="91">I2C Header</text>
-<text x="177.8" y="198.12" size="1.778" layer="91">8MHz Resonator</text>
+<text x="190.5" y="203.2" size="1.778" layer="91">8MHz Resonator</text>
 <text x="35.56" y="129.54" size="1.778" layer="91">or LP2985AIM5-3.3</text>
 <text x="35.56" y="111.76" size="1.778" layer="91">Battery voltage monitor</text>
 </plain>
