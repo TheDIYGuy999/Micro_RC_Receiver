@@ -56,6 +56,11 @@ New in V 2.0
 - vehicle Config.h: New vehicleType 3 (forklift) added. Motor 2 is used as lifting motor in this case. A servo is required as steering motor.
 - Beacon lights can be wired to servo channel 4. Select "beacons = true" in this case. The beacons are flashing during vehicle movement and are switching off, after the vehicle did not move for 10s.
 
+New in V 2.1
+- Sounds for a STAR WARS R2-D2 robot can now be generated on servo channel 3
+- "toneOut" variable added to vehicleConfig.h. True means, that servo 3 channel is generating sounds instead of a servo signal.
+- Do not enable "toneOut" and "engineSound" at the same time.
+- Note: the Arduino tone() function is blocking. So don't play sounds while driving ;-)
 
 ## Usage
 

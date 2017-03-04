@@ -4,7 +4,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.0; // Software revision
+const float codeVersion = 2.1; // Software revision
 
 //
 // =======================================================================================================
@@ -33,6 +33,7 @@ const float codeVersion = 2.0; // Software revision
 #include "readVCC.h"
 #include "vehicleConfig.h"
 #include "steeringCurves.h"
+#include "tone.h"
 
 //
 // =======================================================================================================
@@ -202,6 +203,8 @@ void setup() {
   delay(3000);
 #endif
 
+  R2D2_tell();
+
   // LED setup
   if (tailLights) tailLight.begin(A1); // A1 = Servo 2 Pin
   if (headLights) headLight.begin(0); // 0 = RXI Pin
@@ -217,7 +220,7 @@ void setup() {
   // Servo pins
   servo1.attach(A0);
   if (!tailLights) servo2.attach(A1);
-  if (!engineSound) servo3.attach(A2);
+  if (!engineSound && !toneOut) servo3.attach(A2);
   if (!beacons) servo4.attach(A3);
 
   // All axes to neutral position
@@ -470,7 +473,6 @@ void driveMotorsForklift() {
     millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
   }
   Motor2.drive(data.axis2, steeringTorque, 0, false); // The fork lifting motor (the steering is driven by servo 1)
-
 }
 
 //
@@ -542,7 +544,7 @@ void driveMotorsSteering() {
   Motor1.drive(pwm[0], 255, 0, false); // left caterpillar
   Motor2.drive(pwm[1], 255, 0, false); // right caterpillar
 
-  if (pwm[0] > 5 || pwm[1] > 5) {
+  if (pwm[0] < 40 || pwm[0] > 60 || pwm[1] < 40 || pwm[1] > 60) {
     millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
   }
 }
@@ -555,7 +557,10 @@ void driveMotorsSteering() {
 
 void digitalOutputs() {
   if (TXO_momentary1) { // only, if function is enabled in vehicle configuration
-    if (data.momentary1) digitalWrite(DIGITAL_OUT_1, HIGH);
+    if (data.momentary1) {
+      digitalWrite(DIGITAL_OUT_1, HIGH);
+      R2D2_tell();
+    }
     else digitalWrite(DIGITAL_OUT_1, LOW);
   }
 }
@@ -658,8 +663,8 @@ void loop() {
   writeServos();
 
   // Drive the motors
-  if (vehicleType == 0)driveMotorsCar(); // Car
-  else if (vehicleType == 3)driveMotorsForklift(); // Forklift
+  if (vehicleType == 0) driveMotorsCar(); // Car
+  else if (vehicleType == 3) driveMotorsForklift(); // Forklift
   else driveMotorsSteering(); // Caterpillar and half caterpillar vecicles
 
   // Battery check

@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_FORKLIFT // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_R2D2 // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -56,6 +56,9 @@
 
   // Engine sound
   boolean engineSound; // true = a "TheDIYGuy999" engine simulator is wired to servo channel 3
+
+  // Engine sound
+  boolean engineSound = false; // true = a BC337 amplifier for tone() is connected instead of servo 3
 */
 
 // Generic configuration, board v1.0-------------------------------------------------------------------------
@@ -104,6 +107,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // MECCANO V1.2 standard configuration-----------------------------------------------------------------
@@ -152,6 +158,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // Generic configuration, board v1.3-------------------------------------------------------------------
@@ -197,6 +206,9 @@ byte pwmPrescaler2 = 8; // 3936Hz
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean potentiometer1 = true;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // Disney Lightning McQueen 95----------------------------------------------------------------------
@@ -245,6 +257,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // Disney 95 "DINOCO"--------------------------------------------------------------------------------
@@ -293,6 +308,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // Maisto Mustang GT Fastback---------------------------------------------------------------------------
@@ -341,6 +359,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = true;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // Maisto Dodge Challenger----------------------------------------------------------------------------
@@ -389,6 +410,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // GearGmax / KIDZTECH TOYS Porsche GT3 RS 4.0--------------------------------------------------------
@@ -437,6 +461,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // Coke Can Car--------------------------------------------------------------------------------------
@@ -485,6 +512,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // KD-Summit S600 RC Truggy-------------------------------------------------------------------------
@@ -533,6 +563,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // Maisto Chevy Camaro---------------------------------------------------------------------------
@@ -581,6 +614,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // 1:18 LaFerrari-------------------------------------------------------------------------
@@ -630,6 +666,8 @@ boolean potentiometer1 = true;
 // Engine sound
 boolean engineSound = false;
 
+// Tone sound
+boolean toneOut = false;
 #endif
 
 // Rui Chuang Forklift-------------------------------------------------------------------------
@@ -678,13 +716,66 @@ boolean potentiometer1 = true;
 // Engine sound
 boolean engineSound = false;
 
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// R2-D2 STAR WARS robot-----------------------------------------------------------------------
+#ifdef CONFIG_R2D2
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.45;
+
+// Board type
+float boardVersion = 1.2;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 10;
+
+// Vehicle type
+byte vehicleType = 2; // 2 = caterpillar mode
+
+// Lights
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = true;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+byte maxAccelerationFull = 3;
+byte maxAccelerationLimited = 12;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = true;
 #endif
 
 // Caterpillar test vehicle-----------------------------------------------------------------------
 #ifdef CONFIG_CATERPILLAR_TEST
 // Battery type
 boolean liPo = false;
-float cutoffVoltage = 3.1; cutoffVoltage
+float cutoffVoltage = 3.1;
 
 // Board type
 float boardVersion = 1.0;
@@ -726,6 +817,9 @@ boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
 #endif
 
 #endif
