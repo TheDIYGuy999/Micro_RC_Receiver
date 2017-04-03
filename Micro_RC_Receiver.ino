@@ -2,7 +2,7 @@
 // ATMEL Mega 328P TQFP 32 soldered directly to the board, 8MHz external resonator,
 // 2.4GHz NRF24L01 SMD radio module, TB6612FNG dual dc motor driver
 
-See: https://www.youtube.com/playlist?list=PLGO5EJJClJBCjIvu8frS7LrEU3H2Yz_so
+// See: https://www.youtube.com/playlist?list=PLGO5EJJClJBCjIvu8frS7LrEU3H2Yz_so
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
