@@ -1,4 +1,6 @@
-Copyright (c) 2016 TheDIYGuy999
+Copyright (c) 2016 - 2017 TheDIYGuy999
+
+(parts of balancing.h Copyright (c) Joop Brokking)
 
 MIT License
 

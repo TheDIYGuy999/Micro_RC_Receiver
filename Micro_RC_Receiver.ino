@@ -2,9 +2,11 @@
 // ATMEL Mega 328P TQFP 32 soldered directly to the board, 8MHz external resonator,
 // 2.4GHz NRF24L01 SMD radio module, TB6612FNG dual dc motor driver
 
+See: https://www.youtube.com/playlist?list=PLGO5EJJClJBCjIvu8frS7LrEU3H2Yz_so
+
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.1; // Software revision
+const float codeVersion = 2.2; // Software revision
 
 //
 // =======================================================================================================
@@ -21,19 +23,22 @@ const float codeVersion = 2.1; // Software revision
 //
 
 // Libraries
-#include <SPI.h>
+#include <SPI.h> // SPI library
+#include <Wire.h> // I2C library (for the MPU6050 gyro /accelerometer)
 #include <RF24.h> // Installed via Tools > Board > Boards Manager > Type RF24
 #include <printf.h>
 #include <Servo.h>
 #include <statusLED.h> // https://github.com/TheDIYGuy999/statusLED
-#include <TB6612FNG.h> // https://github.com/TheDIYGuy999/TB6612FNG ***NOTE*** V1.1 required!!
+#include <TB6612FNG.h> // https://github.com/TheDIYGuy999/TB6612FNG ***NOTE*** V1.2 required!! <<<-----
 #include <PWMFrequency.h> // https://github.com/TheDIYGuy999/PWMFrequency
+#include <PID_v1.h> // https://github.com/br3ttb/Arduino-PID-Library/
 
 // Tabs (header files in sketch directory)
 #include "readVCC.h"
 #include "vehicleConfig.h"
 #include "steeringCurves.h"
 #include "tone.h"
+#include "balancing.h"
 
 //
 // =======================================================================================================
@@ -234,6 +239,14 @@ void setup() {
 
   // Motor driver setup
   setupMotors();
+
+  if (vehicleType == 4) { // Only for self balancing vehicles
+    // MPU 6050 accelerometer / gyro setup
+    setupMpu6050();
+
+    // PID controller setup
+    setupPid();
+  }
 }
 
 //
@@ -425,13 +438,13 @@ void driveMotorsCar() {
   // false = brake in neutral position inactive
 
   if (!HP) { // Two channel version: ----
-    if (Motor1.drive(data.axis3, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
+    if (Motor1.drive(data.axis3, minPWM, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
       millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
     }
-    Motor2.drive(data.axis1, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+    Motor2.drive(data.axis1, 0, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
   }
   else { // High Power "HP" version. Motor 2 is the dirving motor, no motor 1: ----
-    if (Motor2.drive(data.axis3, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
+    if (Motor2.drive(data.axis3, minPWM, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
       millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
     }
   }
@@ -469,10 +482,10 @@ void driveMotorsForklift() {
   // false = brake in neutral position inactive
 
 
-  if (Motor1.drive(data.axis3, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
+  if (Motor1.drive(data.axis3, minPWM, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
     millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
   }
-  Motor2.drive(data.axis2, steeringTorque, 0, false); // The fork lifting motor (the steering is driven by servo 1)
+  Motor2.drive(data.axis2, 0, steeringTorque, 0, false); // The fork lifting motor (the steering is driven by servo 1)
 }
 
 //
@@ -541,12 +554,70 @@ void driveMotorsSteering() {
     pwm[1] = 0;
   }
 
-  Motor1.drive(pwm[0], 255, 0, false); // left caterpillar
-  Motor2.drive(pwm[1], 255, 0, false); // right caterpillar
+  Motor1.drive(pwm[0], 0, 255, 0, false); // left caterpillar, 0ms ramp!
+  Motor2.drive(pwm[1], 0, 255, 0, false); // right caterpillar
 
   if (pwm[0] < 40 || pwm[0] > 60 || pwm[1] < 40 || pwm[1] > 60) {
     millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
   }
+}
+
+//
+// =======================================================================================================
+// "BALANCING" MOTOR DRIVING FUNCTION (for self balancing robot)
+// =======================================================================================================
+//
+
+void driveMotorsBalancing() {
+
+  // The steering overlay is in degrees per second, controlled by the MPU 6050 yaw rate and yoystick axis 1
+  int steering = ((data.axis1 - 50) / 7) - yaw_rate; // -50 to 50 / 8 = 7°/s - yaw_rate
+  steering = constrain(steering, -7, 7);
+  int speed = angleOutput + 50;
+  speed = constrain(speed, 7, 93); // same range as in setupPID() + 50 offset from above!
+
+  if (angleMeasured > -20.0 && angleMeasured < 20.0) { // Only drive motors, if robot stands upright
+    Motor1.drive(speed - steering, minPWM, maxPWMfull, 0, false); // left caterpillar, 0ms ramp! 50 = neutral!
+    Motor2.drive(speed + steering, minPWM, maxPWMfull, 0, false); // right caterpillar
+  }
+  else { // keep motors off
+    Motor1.drive(50, minPWM, maxPWMfull, 0, false); // left caterpillar, 0ms ramp!
+    Motor2.drive(50, minPWM, maxPWMfull, 0, false); // right caterpillar
+  }
+}
+
+//
+// =======================================================================================================
+// BALANCING CALCULATIONS
+// =======================================================================================================
+//
+
+void balancing() {
+  
+  // Read sensor data
+  readMpu6050Data(); 
+
+  // PID Parameters
+  double speedKp = 0.9, speedKi = 0.1, speedKd = 0.0;
+  double angleKp = data.pot1 / 8.0, angleKi = 20.0, angleKd = 0.0; // You need to connect a potentiometer to the transmitter analog input A6
+
+  // Speed PID controller (important to protect the robot from falling over at full motor rpm!)
+  speedTarget = (data.axis3 - 50.0) / (1.78); // (100 - 50) / 1.78 = Range of about +/- 28 (same as in setupPid() !)
+  speedMeasured = angleOutput;
+  speedPid.SetTunings(speedKp, speedKi, speedKd);
+  speedPid.Compute();
+
+  // Angle PID controller
+  angleTarget = speedOutput / -7.0; // 28.0 (from above) / 7.0 = Range of about +/- 4.0° tilt angle
+  anglePid.SetTunings(angleKp, angleKi, angleKd);
+  anglePid.Compute();
+
+  // Send the calculated values to the motors
+  driveMotorsBalancing();
+
+  // Display PID variables on the transmitter OLED (for debugging only)
+  //payload.vcc = angleMeasured;
+  //payload.batteryVoltage = speedOutput;
 }
 
 //
@@ -665,6 +736,7 @@ void loop() {
   // Drive the motors
   if (vehicleType == 0) driveMotorsCar(); // Car
   else if (vehicleType == 3) driveMotorsForklift(); // Forklift
+  else if (vehicleType == 4) balancing(); // Self balancing robot
   else driveMotorsSteering(); // Caterpillar and half caterpillar vecicles
 
   // Battery check

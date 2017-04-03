@@ -9,6 +9,8 @@
 - very small size
 - Eagle files are also provided, if you want to build your own receiver!
 
+See: https://www.youtube.com/playlist?list=PLGO5EJJClJBCjIvu8frS7LrEU3H2Yz_so
+
 New in V 1.3:
 - Vehicle configuration is now stored in "vehicleConfig.h", so the main code always stays the same.
 - Crude frequency hopping, if bad receiving quality is detected (needs to be improved).
@@ -62,8 +64,16 @@ New in V 2.1
 - Do not enable "toneOut" and "engineSound" at the same time.
 - Note: the Arduino tone() function is blocking. So don't play sounds while driving ;-)
 
+New in V 2.2
+- **** TB6612FNG library update to V1.2 is required! **** https://github.com/TheDIYGuy999/TB6612FNG
+- **** The PID library is required! **** https://github.com/br3ttb/Arduino-PID-Library/
+- Support for self balancing (inverted pendulum, segway) vehicles. See: https://www.youtube.com/watch?v=zse9-l2Yo3Y)
+- A MPU-6050 accelerometer & gyro module is used for the balancing data communication via SDA & SCL
+- Note, that the receiver will not work, if your vehicleType is 4 (balancing) and no MPU-6050 is connected!
+- Do not enable "balancing" and "indicators" at the same time.
+
 ## Usage
 
 See pictures in this repo
 
-(c) 2016 TheDIYGuy999
+(c) 2016 - 2017 TheDIYGuy999
