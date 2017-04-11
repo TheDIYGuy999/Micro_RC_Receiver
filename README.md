@@ -1,9 +1,10 @@
-#This is an ATMEL Mega328P / NRF24L01+ based 2.4GHz radio receiver
+# This is an ATMEL Mega328P / NRF24L01+ based 2.4GHz radio receiver
 ## Features:
+- Programmable with Arduino IDE
 - 4 RC servo connectors
 - integrated TB6612FNG dual dc motor driver
 - serial header
-- I2C header
+- I2C header (for example for the supported MPU-6050)
 - ICSP header for programming with Arduino IDE (use "TheDIYGuy999 328P" board definition and set brownout voltage to 1.8V)
 - NRF24L01+ SMD module integrated
 - very small size
@@ -71,6 +72,10 @@ New in V 2.2
 - A MPU-6050 accelerometer & gyro module is used for the balancing data communication via SDA & SCL
 - Note, that the receiver will not work, if your vehicleType is 4 (balancing) and no MPU-6050 is connected!
 - Do not enable "balancing" and "indicators" at the same time.
+
+New in V 2.21
+- Gyro drift calibration bug fixed
+- Changed the balancing controller refresh rate to 125Hz to reduce jitter on a 8MHz MCU. Reason: one program loop takes 4 - 7ms, so we can't use a time base of 4ms (=250Hz).
 
 ## Usage
 

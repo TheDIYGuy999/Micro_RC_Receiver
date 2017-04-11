@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_GENERIC_V13 // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_SELF_BALANCING // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -849,7 +849,7 @@ boolean toneOut = false;
 #ifdef CONFIG_SELF_BALANCING
 // Battery type
 boolean liPo = false;
-float cutoffVoltage = 3.1;
+float cutoffVoltage = 3.1; // 4 Eneloop cells
 
 // Board type
 float boardVersion = 1.0;
@@ -876,9 +876,12 @@ byte lim4L = 45, lim4R = 135;
 // Motor configuration
 int maxPWMfull = 255;
 int maxPWMlimited = 170;
-int minPWM = 15; // Backlash compensation, important for self balancing!
+int minPWM = 15; // 15 Backlash compensation, important for self balancing!
 byte maxAccelerationFull = 3;
 byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = -0.2; // -0.2° (+ = leans more backwards!) Vary a bit, if you have slow oscillation with big amplitude
 
 // Steering configuration
 byte steeringTorque = 255;

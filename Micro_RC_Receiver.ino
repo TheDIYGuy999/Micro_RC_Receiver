@@ -6,7 +6,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.2; // Software revision
+const float codeVersion = 2.21; // Software revision
 
 //
 // =======================================================================================================
@@ -39,6 +39,7 @@ const float codeVersion = 2.2; // Software revision
 #include "steeringCurves.h"
 #include "tone.h"
 #include "balancing.h"
+#include "helper.h"
 
 //
 // =======================================================================================================
@@ -574,6 +575,13 @@ void driveMotorsBalancing() {
   int steering = ((data.axis1 - 50) / 7) - yaw_rate; // -50 to 50 / 8 = 7°/s - yaw_rate
   steering = constrain(steering, -7, 7);
   int speed = angleOutput + 50;
+
+  // Calculate averaged motor power (speed) for speed controller feedback
+  static unsigned long lastSpeed;
+  if (millis() - lastSpeed >= 8) {  // 8ms
+    speedAveraged = (speedAveraged * 3.0 + angleOutput) / 4.0; // 1:4 (1:8)
+  }
+
   speed = constrain(speed, 7, 93); // same range as in setupPID() + 50 offset from above!
 
   if (angleMeasured > -20.0 && angleMeasured < 20.0) { // Only drive motors, if robot stands upright
@@ -593,31 +601,49 @@ void driveMotorsBalancing() {
 //
 
 void balancing() {
-  
-  // Read sensor data
-  readMpu6050Data(); 
 
-  // PID Parameters
-  double speedKp = 0.9, speedKi = 0.1, speedKd = 0.0;
-  double angleKp = data.pot1 / 8.0, angleKi = 20.0, angleKd = 0.0; // You need to connect a potentiometer to the transmitter analog input A6
+  // Read sensor data
+  readMpu6050Data();
+
+  angleMeasured = angle_pitch - tiltCalibration;
+
+  // Read speed pot with 0.2s fader
+  static unsigned long lastPot;
+  if (millis() - lastPot >= 40) { // 40ms
+    lastPot = millis();
+    speedPot = (speedPot * 4 + data.axis3) / 5; // 1:5
+  }
+
+  // PID Parameters (Test)
+  double speedKp = 0.9, speedKi = 0.03, speedKd = 0.0;
+  double angleKp = data.pot1 / 8.0, angleKi = 25.0, angleKd = 0.12; // /You need to connect a potentiometer to the transmitter analog input A6
+
+  // PID Parameters (Working)
+  //double speedKp = 0.9, speedKi = 0.03, speedKd = 0.0;
+  //double angleKp = data.pot1 / 8.0, angleKi = 25.0, angleKd = 0.12; // You need to connect a potentiometer to the transmitter analog input A6
 
   // Speed PID controller (important to protect the robot from falling over at full motor rpm!)
-  speedTarget = (data.axis3 - 50.0) / (1.78); // (100 - 50) / 1.78 = Range of about +/- 28 (same as in setupPid() !)
-  speedMeasured = angleOutput;
+  speedTarget = ((float)speedPot - 50.0) / 1.51; // (100 - 50) / 1.51 = Range of about +/- 33 (same as in setupPid() !)
+  speedMeasured = speedAveraged * 1.3; //angleOutput; // 43 / 33 = 1.3
   speedPid.SetTunings(speedKp, speedKi, speedKd);
   speedPid.Compute();
 
   // Angle PID controller
-  angleTarget = speedOutput / -7.0; // 28.0 (from above) / 7.0 = Range of about +/- 4.0° tilt angle
+  angleTarget = speedOutput / -8.25; // 33.0 (from above) / 8.25 = Range of about +/- 4.0° tilt angle
+  //angleTarget = (speedPot - 50) / -12.5; // 50 / 12.5 = Range of about +/- 4.0° tilt angle
   anglePid.SetTunings(angleKp, angleKi, angleKd);
   anglePid.Compute();
 
   // Send the calculated values to the motors
   driveMotorsBalancing();
 
-  // Display PID variables on the transmitter OLED (for debugging only)
+  // Display PID variables on the transmitter OLED (for debugging only, comment out the corresponding variables in checkBattery() in this case)
+  //loopDuration(); // compute the loop time
+  //payload.vcc = loopTime;
   //payload.vcc = angleMeasured;
+  //payload.vcc = speedTarget;
   //payload.batteryVoltage = speedOutput;
+  //payload.batteryVoltage = speedMeasured;
 }
 
 //
