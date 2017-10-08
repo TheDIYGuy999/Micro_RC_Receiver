@@ -6,7 +6,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.21; // Software revision
+const float codeVersion = 2.3; // Software revision
 
 //
 // =======================================================================================================
@@ -241,7 +241,7 @@ void setup() {
   // Motor driver setup
   setupMotors();
 
-  if (vehicleType == 4) { // Only for self balancing vehicles
+  if (vehicleType == 4 || vehicleType == 5) { // Only for self balancing vehicles and cars with MRSC
     // MPU 6050 accelerometer / gyro setup
     setupMpu6050();
 
@@ -392,7 +392,9 @@ void readRadio() {
 
 void writeServos() {
   // Aileron or Steering
-  servo1.write(map(data.axis1, 100, 0, lim1L, lim1R) ); // 45 - 135°
+  if (vehicleType != 5) { // If not car with MSRC stabilty control
+    servo1.write(map(data.axis1, 100, 0, lim1L, lim1R) ); // 45 - 135°
+  }
 
   // Elevator
   if (!tailLights) servo2.write(map(data.axis2, 100, 0, lim2L, lim2R) ); // 45 - 135°
@@ -660,6 +662,32 @@ void balancing() {
 
 //
 // =======================================================================================================
+// MRSC (MICRO RC STABILITY CONTROL) CALCULATIONS
+// =======================================================================================================
+//
+
+void mrsc() {
+
+  // Read sensor data
+  readMpu6050Data();
+
+  // Compute steering compensation overlay
+  int turnRateSetPoint = data.axis1 - 50;  // turnRateSetPoint = steering angle (0 to 100) - 50 = -50 to 50
+  int turnRateMeasured = yaw_rate * abs(data.axis3 - 50); // degrees/s * speed
+  int steeringAngle = turnRateSetPoint + (turnRateMeasured * 2 / 3);  // vary this division to to adjust the steering overlay!
+
+  steeringAngle = constrain (steeringAngle, -50, 50);
+
+  // Control steering servo
+  servo1.write(map(steeringAngle, 50, -50, lim1L, lim1R) ); // 45 - 135°
+
+  // Control motors
+  driveMotorsCar();
+
+}
+
+//
+// =======================================================================================================
 // WRITE DIGITAL OUTPUTS (SPECIAL FUNCTIONS)
 // =======================================================================================================
 //
@@ -773,6 +801,7 @@ void loop() {
 
   // Drive the motors
   if (vehicleType == 0) driveMotorsCar(); // Car
+  else if (vehicleType == 5) mrsc(); // Car with MSRC stabilty control
   else if (vehicleType == 3) driveMotorsForklift(); // Forklift
   else if (vehicleType == 4) balancing(); // Self balancing robot
   else driveMotorsSteering(); // Caterpillar and half caterpillar vecicles

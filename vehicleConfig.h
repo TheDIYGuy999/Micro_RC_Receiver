@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_A959 // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_CAMARO // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -29,6 +29,7 @@
   1 = semi caterpillar, 2 = caterpillar (see: https://www.youtube.com/watch?v=Tjikm6hJ8hQ)
   3 = forklift (see: https://www.youtube.com/watch?v=3iXL9WvE4ro)
   4 = balancing (see: https://www.youtube.com/watch?v=zse9-l2Yo3Y)
+  5 = car with MRSC (Micro RC Stability Control. Similar with ABS, ESP, Traxxas Stability Management TSM)
 
   // Lights (see: https://www.youtube.com/watch?v=qbhPqHdBz3o)
   boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"
@@ -987,7 +988,7 @@ boolean HP = false;
 int vehicleNumber = 8;
 
 // Vehicle type
-byte vehicleType = 0;
+byte vehicleType = 5; // MPU6050 module required!
 
 // Lights
 boolean tailLights = false;

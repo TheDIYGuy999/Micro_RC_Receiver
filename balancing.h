@@ -10,12 +10,12 @@
 
   I (TheDIYGuy999) have modified it to fit my needs
 
-  This header file is required for the "balancing" (vehicleType = 4) option in the vehicleConfig.h
+  This header file is required for the "balancing" (vehicleType = 4) or "MRSC" (vehicleType = 5) options in the vehicleConfig.h
   Connect an MPU-6050 sensor to GND, VDD (3.3 and 5V compatible), SCL and SDA.
   Mount it as close as possible to the pivot point of your vehicle
 
   -->> Note:
-  - The receiver will not work, if vehicleType is set to 4 and no MPU-6050 sensor is wired up!!
+  - The receiver will not work, if vehicleType is set to 4 or 5 and no MPU-6050 sensor is wired up!!
   - !! Don't move your vehicle during gyro calibration! (about 6s after powering up) !!
   - The MPU-6050 requires about 20s to stabilize (finding the exact zero point) after powering on!
   - The measurements are taken with 125Hz (8ms) refresh rate. Reason: processing all the code requires up to

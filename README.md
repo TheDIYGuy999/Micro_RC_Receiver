@@ -77,6 +77,12 @@ New in V 2.21
 - Gyro drift calibration bug fixed
 - Changed the balancing controller refresh rate to 125Hz to reduce jitter on a 8MHz MCU. Reason: one program loop takes 4 - 7ms, so we can't use a time base of 4ms (=250Hz).
 
+New in V 2.3
+- MRSC (Micro RC Stability Control) added. This functionality is similar to the Traxxas TSM or ESC.
+- The steering servo angle is compensated in accordance with the speed, the requested steering angle and the measured yaw rate, which is coming from the MPU-6050
+- Basically the mrsc() function was added. The required yaw rate is already calculated in the balancing.h, which is already existing for self balancing robots
+- If you want to use this functionality, you have to set the vehicleType to 5 in the vehicleConfig.h. Please note, that the receiver will not work, if no MPU-6050 is connected and the vehicleType is set to 4 or 5!
+
 ## Usage
 
 See pictures in this repo
