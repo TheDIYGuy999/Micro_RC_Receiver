@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_SELF_BALANCING // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_A959 // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -24,7 +24,7 @@
   int vehicleNumber; // This number must be unique for each vehicle!
 
   // Vehicle type
-  byte vehicleType; 
+  byte vehicleType;
   0 = car (see: https://www.youtube.com/watch?v=A0SoK7KJxyc)
   1 = semi caterpillar, 2 = caterpillar (see: https://www.youtube.com/watch?v=Tjikm6hJ8hQ)
   3 = forklift (see: https://www.youtube.com/watch?v=3iXL9WvE4ro)
@@ -40,6 +40,7 @@
   byte lim1L, lim1R; // Servo 1
   byte lim2L, lim2R;
   byte lim3L, lim3R;
+  byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles for external ESC
   byte lim4L, lim4R; // Servo 4
 
   // Motor configuration
@@ -49,6 +50,9 @@
   byte maxAccelerationFull;// (ms per 1 step input signal change)
   byte maxAccelerationLimited;
 
+  // Variables for self balancing (vehicleType = 4) only!
+  float tiltCalibration = -0.2; // -0.2° (+ = leans more backwards!) Vary a bit, if you have slow oscillation with big amplitude
+
   // Steering configuration (100% torque is 255)
   byte steeringTorque;
 
@@ -57,6 +61,7 @@
 
   // Additional Channels
   boolean TXO_momentary1; // The TXO output is linked to the momentary1 channel! -> Serial not usable, if "true"
+  boolean TXO_toggle1; // The TXO output is linked to the toggle1 channel! -> Serial not usable, if "true"
   boolean potentiometer1;
 
   // Engine sound (see: https://www.youtube.com/watch?v=pPlrx9yVI6E)
@@ -92,6 +97,7 @@ boolean beacons = false;
 byte lim1L = 45, lim1R = 135;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -101,6 +107,8 @@ int minPWM = 0;
 byte maxAccelerationFull = 3;
 byte maxAccelerationLimited = 12;
 
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
 // Steering configuration
 byte steeringTorque = 255;
 
@@ -144,6 +152,7 @@ boolean beacons = false;
 byte lim1L = 45, lim1R = 135;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -152,6 +161,9 @@ int maxPWMlimited = 170;
 int minPWM = 0;
 int maxAccelerationFull = 3;
 int maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
 
 // Steering configuration
 byte steeringTorque = 255;
@@ -196,6 +208,7 @@ boolean beacons = false;
 byte lim1L = 45, lim1R = 135;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -204,6 +217,121 @@ int maxPWMlimited = 170;
 int minPWM = 0;
 byte maxAccelerationFull = 7;
 byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// Generic configuration, board v1.3 HP----------------------------------------------------------------------------
+#ifdef CONFIG_GENERIC_V13_HP
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.6;
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = true; // High Power Board!
+
+// Vehicle address
+int vehicleNumber = 1;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// WlToys K 1:28 Rally Fiesta----------------------------------------------------------------------------
+#ifdef CONFIG_FIESTA
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 4.9; // Regulated 5.0V supply from the ESC
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = true; // High Power Board!
+
+// Vehicle address
+int vehicleNumber = 1;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 55, lim1R = 150; // R55, L150
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 140;
+byte lim3Llow = 75, lim3Rlow = 110; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
 
 // Steering configuration
 byte steeringTorque = 255;
@@ -248,6 +376,7 @@ boolean beacons = false;
 byte lim1L = 61, lim1R = 104;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -256,6 +385,9 @@ int maxPWMlimited = 170;
 int minPWM = 0;
 byte maxAccelerationFull = 3;
 byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
 
 // Steering configuration
 byte steeringTorque = 255;
@@ -300,6 +432,7 @@ boolean beacons = false;
 byte lim1L = 45, lim1R = 135;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -308,6 +441,65 @@ int maxPWMlimited = 170;
 int minPWM = 0;
 byte maxAccelerationFull = 7;
 byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// MECCANO 6952 "Tuning Radio Control"--------------------------------------------------------
+#ifdef CONFIG_MECCANO_6953
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 3.3;
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 3;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 3;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
 
 // Steering configuration
 byte steeringTorque = 255;
@@ -352,6 +544,7 @@ boolean beacons = false;
 byte lim1L = 60, lim1R = 129;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -360,6 +553,9 @@ int maxPWMlimited = 170;
 int minPWM = 0;
 byte maxAccelerationFull = 7;
 byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
 
 // Steering configuration
 byte steeringTorque = 255;
@@ -401,17 +597,21 @@ boolean indicators = true;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 120, lim1R = 55;
+byte lim1L = 134, lim1R = 69; // 120 55
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
-int maxPWMfull = 240; // still a bit limited, but fast as hell!
+int maxPWMfull = 255; // was 245
 int maxPWMlimited = 170;
 int minPWM = 0;
 byte maxAccelerationFull = 7;
 byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
 
 // Steering configuration
 byte steeringTorque = 255;
@@ -453,9 +653,11 @@ boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 45, lim1R = 135;
+byte lim1L = 65, lim1R = 101; // Car # 5: R 65, L 101
+//byte lim1L = 45, lim1R = 135;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -465,6 +667,9 @@ int minPWM = 0;
 byte maxAccelerationFull = 3;
 byte maxAccelerationLimited = 12;
 
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
 // Steering configuration
 byte steeringTorque = 255;
 
@@ -473,6 +678,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = true;
 
 // Engine sound
@@ -508,6 +714,7 @@ boolean beacons = false;
 byte lim1L = 45, lim1R = 135;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -517,6 +724,9 @@ int minPWM = 0;
 byte maxAccelerationFull = 3;
 byte maxAccelerationLimited = 12;
 
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
 // Steering configuration
 byte steeringTorque = 160;
 
@@ -525,6 +735,121 @@ byte pwmPrescaler2 = 1; // We don't want PWM switching noise from the steering! 
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// Ferrari 458 Italia---------------------------------------------------------------------------
+#ifdef CONFIG_458
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.6;
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = true; // High Power Board!
+
+// Vehicle address
+int vehicleNumber = 6;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 146, lim1R = 23; // R146 L23
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// Feiyue FY03 Eagle Buggy---------------------------------------------------------------------------
+#ifdef CONFIG_FY03
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 4.9; // Regulated 5.0V supply from the ESC
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 6;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 125, lim1R = 70; // R125, L70 Steering reversed
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 110, lim3Rlow = 75; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = false;
+boolean TXO_toggle1 = true;
 boolean potentiometer1 = true;
 
 // Engine sound
@@ -538,7 +863,7 @@ boolean toneOut = false;
 #ifdef CONFIG_KD_SUMMIT
 // Battery type
 boolean liPo = true;
-float cutoffVoltage = 3.6;
+float cutoffVoltage = 4.9; // 5V receiver supply voltage surveillance from BEC only!
 
 // Board type
 float boardVersion = 1.3;
@@ -557,9 +882,10 @@ boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 130, lim1R = 50; // Direction inverted!
+byte lim1L = 130, lim1R = 50; // Direction inversed!
 byte lim2L = 45, lim2R = 135;
-byte lim3L = 45, lim3R = 135;
+byte lim3L = 65, lim3R = 120; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
+byte lim3Llow = 75, lim3Rlow = 110; // limited top speed angles! A slight offset towards reverse is required with this ESC
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -569,6 +895,8 @@ int minPWM = 0;
 byte maxAccelerationFull = 7;
 byte maxAccelerationLimited = 12;
 
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
 // Steering configuration
 byte steeringTorque = 255;
 
@@ -577,6 +905,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = true;
 
 // Engine sound
@@ -586,7 +915,65 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
-// Maisto Chevy Camaro---------------------------------------------------------------------------
+// Receiver board scratch build tutorial----------------------------------------------------------------
+#ifdef CONFIG_SCRATCH_TUTORIAL
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 4.4;
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = true; // High Power Board!
+
+// Vehicle address
+int vehicleNumber = 8;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 35, lim1R = 132;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 5;
+byte maxAccelerationFull = 12;
+byte maxAccelerationLimited = 15;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+
+// Maisto Chevy Camaro SS---------------------------------------------------------------------------
 #ifdef CONFIG_CAMARO
 // Battery type
 boolean liPo = true;
@@ -609,9 +996,10 @@ boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 45, lim1R = 135;
+byte lim1L = 120, lim1R = 45;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -621,11 +1009,71 @@ int minPWM = 0;
 byte maxAccelerationFull = 7;
 byte maxAccelerationLimited = 12;
 
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
 // Steering configuration
 byte steeringTorque = 255;
 
 // Motor 2 PWM frequency
 byte pwmPrescaler2 = 1; // We don't want PWM switching noise from the steering! So, 31.5KHz frequency.
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// JLB Racing Cheetah----------------------------------------------------------------------------
+#ifdef CONFIG_CHEETAH
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 3.6; // Brushless ESC has its own battery protection
+
+// Board type
+float boardVersion = 1.3;
+boolean HP = true; // High Power Board!
+
+// Vehicle address
+int vehicleNumber = 8;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 140, lim1R = 45; // Steering reversed
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 115, lim3Rlow = 70; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
@@ -638,11 +1086,68 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
+// Remo Hobby S Max---------------------------------------------------------------------------
+#ifdef CONFIG_S_MAX
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.45; // Regulated 5.0V supply from the ESC
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 9;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 125, lim1R = 70; // R125, L70 Steering reversed
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 135, lim3R = 45; // ESC output signal reversed
+byte lim3Llow = 105, lim3Rlow = 75; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = false;
+boolean TXO_toggle1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
 // 1:18 LaFerrari-------------------------------------------------------------------------
 #ifdef CONFIG_LAFERRARI
 // Battery type
-boolean liPo = false;
-float cutoffVoltage = 4.4; // 4 NiMh cells
+boolean liPo = true;
+float cutoffVoltage = 4.9; // 5V receiver supply voltage surveillance from BEC only!
 
 // Board type
 float boardVersion = 1.2;
@@ -661,9 +1166,10 @@ boolean indicators = true;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 45, lim1R = 135;
+byte lim1L = 50, lim1R = 140; // R74  L116
 byte lim2L = 45, lim2R = 135;
-byte lim3L = 45, lim3R = 135;
+byte lim3L = 65, lim3R = 120; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
+byte lim3Llow = 75, lim3Rlow = 110; // limited top speed angles! A slight offset towards reverse is required with this ESC
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -673,6 +1179,9 @@ int minPWM = 0;
 byte maxAccelerationFull = 7;
 byte maxAccelerationLimited = 12;
 
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
 // Steering configuration
 byte steeringTorque = 255;
 
@@ -681,6 +1190,64 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// Wltoys A959---------------------------------------------------------------------------
+#ifdef CONFIG_A959
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.45; // Regulated 5.0V supply from the ESC
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 10;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 80, lim1R = 125; // R80, L125 Steering reversed
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 135, lim3R = 45; // ESC output signal reversed
+byte lim3Llow = 105, lim3Rlow = 75; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = false;
+boolean TXO_toggle1 = true;
 boolean potentiometer1 = true;
 
 // Engine sound
@@ -716,6 +1283,7 @@ boolean beacons = true;
 byte lim1L = 145, lim1R = 35;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -725,6 +1293,9 @@ int minPWM = 0;
 byte maxAccelerationFull = 7;
 byte maxAccelerationLimited = 12;
 
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
 // Steering configuration (lift in this case)
 byte steeringTorque = 255;
 
@@ -732,6 +1303,7 @@ byte steeringTorque = 255;
 byte pwmPrescaler2 = 32;
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = true;
 
 // Engine sound
@@ -767,6 +1339,7 @@ boolean beacons = true;
 byte lim1L = 45, lim1R = 135;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -776,6 +1349,9 @@ int minPWM = 0;
 byte maxAccelerationFull = 3;
 byte maxAccelerationLimited = 12;
 
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
 // Steering configuration
 byte steeringTorque = 255;
 
@@ -784,6 +1360,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = true;
 
 // Engine sound
@@ -819,6 +1396,7 @@ boolean beacons = false;
 byte lim1L = 45, lim1R = 135;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -828,6 +1406,9 @@ int minPWM = 0;
 byte maxAccelerationFull = 3;
 byte maxAccelerationLimited = 12;
 
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
 // Steering configuration
 byte steeringTorque = 255;
 
@@ -836,6 +1417,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = true;
 
 // Engine sound
@@ -871,6 +1453,7 @@ boolean beacons = false;
 byte lim1L = 45, lim1R = 135;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -891,6 +1474,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = false;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = true;
 
 // Engine sound

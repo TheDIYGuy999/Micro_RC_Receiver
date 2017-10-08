@@ -391,9 +391,21 @@ void readRadio() {
 //
 
 void writeServos() {
+  // Aileron or Steering
   servo1.write(map(data.axis1, 100, 0, lim1L, lim1R) ); // 45 - 135°
+
+  // Elevator
   if (!tailLights) servo2.write(map(data.axis2, 100, 0, lim2L, lim2R) ); // 45 - 135°
-  servo3.write(map(data.axis3, 100, 0, lim3L, lim3R) ); // 45 - 135°
+
+  // Throttle (for ESC control, if you don't use the internal TB6612FNG motor driver)
+  if (data.mode1) { // limited speed!
+    servo3.write(map(data.axis3, 100, 0, lim3Llow, lim3Rlow ) ); // less than +/- 45°
+  }
+  else { // full speed!
+    servo3.write(map(data.axis3, 100, 0, lim3L, lim3R) ); // 45 - 135°
+  }
+
+  // Rudder
   if (!beacons) servo4.write(map(data.axis4, 100, 0, lim4L, lim4R) ); // 45 - 135°
 
   // Axis 2 on the joystick switches engine sound on servo channel 3 on and off!
@@ -630,7 +642,7 @@ void balancing() {
 
   // Angle PID controller
   angleTarget = speedOutput / -8.25; // 33.0 (from above) / 8.25 = Range of about +/- 4.0° tilt angle
-  //angleTarget = (speedPot - 50) / -12.5; // 50 / 12.5 = Range of about +/- 4.0° tilt angle
+  //  angleTarget = (speedPot - 50) / -12.5; // 50 / 12.5 = Range of about +/- 4.0° tilt angle
   anglePid.SetTunings(angleKp, angleKi, angleKd);
   anglePid.Compute();
 
