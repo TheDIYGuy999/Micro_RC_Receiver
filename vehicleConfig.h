@@ -29,7 +29,8 @@
   1 = semi caterpillar, 2 = caterpillar (see: https://www.youtube.com/watch?v=Tjikm6hJ8hQ)
   3 = forklift (see: https://www.youtube.com/watch?v=3iXL9WvE4ro)
   4 = balancing (see: https://www.youtube.com/watch?v=zse9-l2Yo3Y)
-  5 = car with MRSC (Micro RC Stability Control. Similar with ABS, ESP, Traxxas Stability Management TSM)
+  5 = car with MRSC (Micro RC Stability Control. Similar with ABS, ESP, Traxxas Stability Management TSM) Potentiometer on A6 input of
+  your transmitter required! (see: https://www.youtube.com/watch?v=IPve7QpdLBc&t=5s)
 
   // Lights (see: https://www.youtube.com/watch?v=qbhPqHdBz3o)
   boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"

@@ -78,10 +78,15 @@ New in V 2.21
 - Changed the balancing controller refresh rate to 125Hz to reduce jitter on a 8MHz MCU. Reason: one program loop takes 4 - 7ms, so we can't use a time base of 4ms (=250Hz).
 
 New in V 2.3
-- MRSC (Micro RC Stability Control) added. This functionality is similar to the Traxxas TSM or ESC.
+- MRSC (Micro RC Stability Control) added. This functionality is similar to the Traxxas TSM or ESC. See: https://www.youtube.com/watch?v=IPve7QpdLBc&t=5s
 - The steering servo angle is compensated in accordance with the speed, the requested steering angle and the measured yaw rate, which is coming from the MPU-6050
 - Basically the mrsc() function was added. The required yaw rate is already calculated in the balancing.h, which is already existing for self balancing robots
 - If you want to use this functionality, you have to set the vehicleType to 5 in the vehicleConfig.h. Please note, that the receiver will not work, if no MPU-6050 is connected and the vehicleType is set to 4 or 5!
+
+New in V 2.31
+ - MRSC gain factor now depending on the potentiometer 1 value on the transmitter
+ - Allows to fine adjust the MRSC during driving, depending on the requirements of the street surface
+ - Note, that you need to connect a potentiometer to the analog input A6 of your transmitter!
 
 ## Usage
 

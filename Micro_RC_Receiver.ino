@@ -6,7 +6,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.3; // Software revision
+const float codeVersion = 2.31; // Software revision
 
 //
 // =======================================================================================================
@@ -674,7 +674,7 @@ void mrsc() {
   // Compute steering compensation overlay
   int turnRateSetPoint = data.axis1 - 50;  // turnRateSetPoint = steering angle (0 to 100) - 50 = -50 to 50
   int turnRateMeasured = yaw_rate * abs(data.axis3 - 50); // degrees/s * speed
-  int steeringAngle = turnRateSetPoint + (turnRateMeasured * 2 / 3);  // vary this division to to adjust the steering overlay!
+  int steeringAngle = turnRateSetPoint + (turnRateMeasured * data.pot1 / 100);  // Compensation depending on the pot value
 
   steeringAngle = constrain (steeringAngle, -50, 50);
 
