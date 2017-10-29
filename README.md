@@ -87,6 +87,10 @@ New in V 2.31
  - MRSC gain factor now depending on the potentiometer 1 value on the transmitter
  - Allows to fine adjust the MRSC during driving, depending on the requirements of the street surface
  - Note, that you need to connect a potentiometer to the analog input A6 of your transmitter!
+ 
+ New in V 2.32
+ - Flickering headlights bug in vehicleType 5 fixed
+ - The accelerometer vectors are not processed anymore in vehicleType 5. This is only required for the self balancing robot (vehicleType 4)
 
 ## Usage
 

@@ -646,7 +646,7 @@ boolean HP = false;
 int vehicleNumber = 5; // one car number 2 and one number 5!
 
 // Vehicle type
-byte vehicleType = 0;
+byte vehicleType = 5; // MRSC vehicle!
 
 // Lights
 boolean tailLights = false;
@@ -655,7 +655,7 @@ boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 65, lim1R = 101; // Car # 5: R 65, L 101
+byte lim1L = 62, lim1R = 101; // Car # 5: R 65, L 101
 //byte lim1L = 45, lim1R = 135;
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
@@ -998,7 +998,7 @@ boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 120, lim1R = 45;
+byte lim1L = 127, lim1R = 52; // R120, L45 Steering reversed
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
 byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!

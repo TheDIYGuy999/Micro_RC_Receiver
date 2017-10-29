@@ -6,7 +6,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.31; // Software revision
+const float codeVersion = 2.32; // Software revision
 
 //
 // =======================================================================================================
@@ -23,7 +23,6 @@ const float codeVersion = 2.31; // Software revision
 //
 
 // Libraries
-#include <SPI.h> // SPI library
 #include <Wire.h> // I2C library (for the MPU6050 gyro /accelerometer)
 #include <RF24.h> // Installed via Tools > Board > Boards Manager > Type RF24
 #include <printf.h>
@@ -209,6 +208,17 @@ void setup() {
   delay(3000);
 #endif
 
+#ifndef DEBUG
+Serial.end();
+//UCSR0B &= ~(1<<RXEN0);      // disable RX
+//digitalWrite(0, LOW);
+//digitalWrite(1, LOW);
+//UCSR0B &= ~(1<<TXEN0);  //disable TX   
+//UCSR0B &= ~(1<<RXEN0);  //disable RX
+//UCSR0A = 0b00000000;
+UCSR0B = 0b00000000;
+#endif
+
   R2D2_tell();
 
   // LED setup
@@ -257,77 +267,77 @@ void setup() {
 //
 
 void led() {
-
-  // Lights are switching off 10s after the vehicle did stop
-  if (millis() - millisLightOff >= 10000) {
-    headLight.off(); // Headlight off
-    tailLight.off(); // Taillight off
-    beaconLights.off(); // Beacons off
-  }
-  else {
-    headLight.on();
-    if (!HP && Motor1.brakeActive() || HP && Motor2.brakeActive()) { // if braking detected from TB6612FNG motor driver
-      tailLight.on(); // Brake light (full brightness)
+  
+    // Lights are switching off 10s after the vehicle did stop
+    if (millis() - millisLightOff >= 10000) {
+      headLight.off(); // Headlight off
+      tailLight.off(); // Taillight off
+      beaconLights.off(); // Beacons off
     }
     else {
-      tailLight.flash(10, 14, 0, 0); // Taillight: 10 on  / 14 off = about 40% brightness (soft PWM)
-    }
-    beaconLights.flash(50, 650, 0, 0); // Simulate rotating beacon lights with short flashes
-  }
-
-  // Indicator lights ----
-  if (indicators) {
-    // Set and reset by lever
-    if (data.axis4 < 5) left = true;
-    if (data.axis4 > 55) left = false;
-
-    if (data.axis4 > 95) right = true;
-    if (data.axis4 < 45) right = false;
-
-    // Reset by steering
-    static int steeringOld;
-
-    if (data.axis1 > steeringOld + 10) {
-      left = false;
-      steeringOld = data.axis1;
-    }
-
-    if (data.axis1 < steeringOld - 10) {
-      right = false;
-      steeringOld = data.axis1;
-    }
-
-    // Lights
-    if (left) { // Left indicator
-      right = false;
-      indicatorL.flash(375, 375, 0, 0);
-      indicatorR.off();
-    }
-
-    if (right) { // Right indicator
-      left = false;
-      indicatorR.flash(375, 375, 0, 0);
-      indicatorL.off();
-    }
-
-    if (hazard) { // Hazard lights
-      if (left) {
-        left = false;
-        indicatorL.off();
+      if (!HP && Motor1.brakeActive() || HP && Motor2.brakeActive()) { // if braking detected from TB6612FNG motor driver
+        tailLight.on(); // Brake light (full brightness)
       }
-      if (right) {
+      else {
+        tailLight.flash(10, 14, 0, 0); // Taillight: 10 on  / 14 off = about 40% brightness (soft PWM)
+      }
+      beaconLights.flash(50, 650, 0, 0); // Simulate rotating beacon lights with short flashes
+      headLight.on(); // Headlight on
+    }
+
+    // Indicator lights ----
+    if (indicators) {
+      // Set and reset by lever
+      if (data.axis4 < 5) left = true;
+      if (data.axis4 > 55) left = false;
+
+      if (data.axis4 > 95) right = true;
+      if (data.axis4 < 45) right = false;
+
+      // Reset by steering
+      static int steeringOld;
+
+      if (data.axis1 > steeringOld + 10) {
+        left = false;
+        steeringOld = data.axis1;
+      }
+
+      if (data.axis1 < steeringOld - 10) {
         right = false;
+        steeringOld = data.axis1;
+      }
+
+      // Lights
+      if (left) { // Left indicator
+        right = false;
+        indicatorL.flash(375, 375, 0, 0);
         indicatorR.off();
       }
-      indicatorL.flash(375, 375, 0, 0);
-      indicatorR.flash(375, 375, 0, 0);
-    }
 
-    if (!hazard && !left && !right) {
-      indicatorL.off();
-      indicatorR.off();
+      if (right) { // Right indicator
+        left = false;
+        indicatorR.flash(375, 375, 0, 0);
+        indicatorL.off();
+      }
+
+      if (hazard) { // Hazard lights
+        if (left) {
+          left = false;
+          indicatorL.off();
+        }
+        if (right) {
+          right = false;
+          indicatorR.off();
+        }
+        indicatorL.flash(375, 375, 0, 0);
+        indicatorR.flash(375, 375, 0, 0);
+      }
+
+      if (!hazard && !left && !right) {
+        indicatorL.off();
+        indicatorR.off();
+      }
     }
-  }
 }
 
 //

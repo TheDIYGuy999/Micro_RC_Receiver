@@ -96,33 +96,35 @@ void processMpu6050Data() {
   angle_roll += gyro_y * 0.0004885;                                    // Calculate the traveled roll angle and add this to the angle_roll variable
   yaw_rate = gyro_z * 0.0004885;                                       // Yaw rate in degrees per second
 
-  //0.000001066 = 0.0000611 * (3.142(PI) / 180degr) The Arduino sin function is in radians (not required in this application)
-  //angle_pitch += angle_roll * sin(gyro_z * 0.000001066);               // If the IMU has yawed transfer the roll angle to the pitch angle
-  //angle_roll -= angle_pitch * sin(gyro_z * 0.000001066);               // If the IMU has yawed transfer the pitch angle to the roll angle
+  if (vehicleType == 4) { // Those calculations are only required for the self balancing robot. Otherwise we can save some processing time.
+    //0.000001066 = 0.0000611 * (3.142(PI) / 180degr) The Arduino sin function is in radians (not required in this application)
+    //angle_pitch += angle_roll * sin(gyro_z * 0.000001066);               // If the IMU has yawed transfer the roll angle to the pitch angle
+    //angle_roll -= angle_pitch * sin(gyro_z * 0.000001066);               // If the IMU has yawed transfer the pitch angle to the roll angle
 
-  //Accelerometer reading averaging to improve vibration resistance (added by TheDIYGuy999)
-  acc_x = (acc_x * 9 + acc_x_raw) / 10;
-  acc_y = (acc_y * 9 + acc_y_raw) / 10;
-  acc_z = (acc_z * 9 + acc_z_raw) / 10;
+    //Accelerometer reading averaging to improve vibration resistance (added by TheDIYGuy999)
+    acc_x = (acc_x * 9 + acc_x_raw) / 10;
+    acc_y = (acc_y * 9 + acc_y_raw) / 10;
+    acc_z = (acc_z * 9 + acc_z_raw) / 10;
 
-  //Accelerometer angle calculations
-  acc_total_vector = sqrt((acc_x * acc_x) + (acc_y * acc_y) + (acc_z * acc_z)); // Calculate the total accelerometer vector
-  //57.296 = 1 / (3.142 / 180) The Arduino asin function is in radians
-  if (abs(acc_y) < acc_total_vector) {                                      //Prevent the asin function to produce a NaN
-    angle_pitch_acc = asin((float)acc_y / acc_total_vector) * 57.296;       //Calculate the pitch angle.
-  }
-  if (abs(acc_x) < acc_total_vector) {                                      //Prevent the asin function to produce a NaN
-    angle_roll_acc = asin((float)acc_x / acc_total_vector) * -57.296;       //Calculate the roll angle.
-  }
+    //Accelerometer angle calculations
+    acc_total_vector = sqrt((acc_x * acc_x) + (acc_y * acc_y) + (acc_z * acc_z)); // Calculate the total accelerometer vector
+    //57.296 = 1 / (3.142 / 180) The Arduino asin function is in radians
+    if (abs(acc_y) < acc_total_vector) {                                      //Prevent the asin function to produce a NaN
+      angle_pitch_acc = asin((float)acc_y / acc_total_vector) * 57.296;       //Calculate the pitch angle.
+    }
+    if (abs(acc_x) < acc_total_vector) {                                      //Prevent the asin function to produce a NaN
+      angle_roll_acc = asin((float)acc_x / acc_total_vector) * -57.296;       //Calculate the roll angle.
+    }
 
-  if (set_gyro_angles) {                                               // If the IMU is already started (zero drift protection)
-    angle_pitch = angle_pitch * 0.99 + angle_pitch_acc * 0.01;         // Correct the drift of the gyro pitch angle with the accelerometer pitch angle
-    angle_roll = angle_roll * 0.99 + angle_roll_acc * 0.01;            // Correct the drift of the gyro roll angle with the accelerometer roll angle
-  }
-  else {                                                               // At first start
-    angle_pitch = angle_pitch_acc;                                     // Set the gyro pitch angle equals to the accelerometer pitch angle
-    angle_roll = angle_roll_acc;                                       // Set the gyro roll angle equals to the accelerometer roll angle
-    set_gyro_angles = true;                                            // Set the IMU started flag
+    if (set_gyro_angles) {                                               // If the IMU is already started (zero drift protection)
+      angle_pitch = angle_pitch * 0.99 + angle_pitch_acc * 0.01;         // Correct the drift of the gyro pitch angle with the accelerometer pitch angle
+      angle_roll = angle_roll * 0.99 + angle_roll_acc * 0.01;            // Correct the drift of the gyro roll angle with the accelerometer roll angle
+    }
+    else {                                                               // At first start
+      angle_pitch = angle_pitch_acc;                                     // Set the gyro pitch angle equals to the accelerometer pitch angle
+      angle_roll = angle_roll_acc;                                       // Set the gyro roll angle equals to the accelerometer roll angle
+      set_gyro_angles = true;                                            // Set the IMU started flag
+    }
   }
 }
 
