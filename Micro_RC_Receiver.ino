@@ -1,12 +1,13 @@
 // 4 Channel "Micro RC" Receiver with 4 standard RC Servo Outputs
 // ATMEL Mega 328P TQFP 32 soldered directly to the board, 8MHz external resonator,
 // 2.4GHz NRF24L01 SMD radio module, TB6612FNG dual dc motor driver
+// An MPU-6050 gyro / accelerometer can be used for MRSC stability control or self balancing robots
 
 // See: https://www.youtube.com/playlist?list=PLGO5EJJClJBCjIvu8frS7LrEU3H2Yz_so
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.32; // Software revision
+const float codeVersion = 2.4; // Software revision
 
 //
 // =======================================================================================================
@@ -23,7 +24,7 @@ const float codeVersion = 2.32; // Software revision
 //
 
 // Libraries
-#include <Wire.h> // I2C library (for the MPU6050 gyro /accelerometer)
+#include <Wire.h> // I2C library (for the MPU-6050 gyro /accelerometer)
 #include <RF24.h> // Installed via Tools > Board > Boards Manager > Type RF24
 #include <printf.h>
 #include <Servo.h>
@@ -209,13 +210,7 @@ void setup() {
 #endif
 
 #ifndef DEBUG
-Serial.end();
-//UCSR0B &= ~(1<<RXEN0);      // disable RX
-//digitalWrite(0, LOW);
-//digitalWrite(1, LOW);
-//UCSR0B &= ~(1<<TXEN0);  //disable TX   
-//UCSR0B &= ~(1<<RXEN0);  //disable RX
-//UCSR0A = 0b00000000;
+Serial.end(); // make sure, serial is off!
 UCSR0B = 0b00000000;
 #endif
 

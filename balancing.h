@@ -172,6 +172,15 @@ void setupMpu6050() {
 
   Wire.begin();                                                        // Start I2C as master
 
+  // Is an an MPU-6050 (address 0x68) on the I2C bus present?
+  // Allows to use the receiver without an MPU-6050 plugged in (not in balancing mode, vehicleType 4)
+  Wire.beginTransmission(0x68);
+  byte error = Wire.endTransmission();                                 // Read the I2C error byte
+  if (vehicleType == 5 && error > 0) {                                 // If MRSC vehicle (5) is active and there is a bus error
+    vehicleType = 0;                                                   // Fall back to vehicle type 0 (car without MPU-6050)
+    return;                                                            // Cancel the MPU-6050 setup
+  }
+
   // Activate the MPU-6050
   Wire.beginTransmission(0x68);                                        // Start communicating with the MPU-6050
   Wire.write(0x6B);                                                    // Send the requested starting register

@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_CAMARO // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_PORSCHE // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -761,7 +761,7 @@ boolean HP = true; // High Power Board!
 int vehicleNumber = 6;
 
 // Vehicle type
-byte vehicleType = 0;
+byte vehicleType = 5; // MRSC vehicle!
 
 // Lights
 boolean tailLights = false;
@@ -790,7 +790,7 @@ float tiltCalibration = 0.0;
 byte steeringTorque = 255;
 
 // Motor 2 PWM frequency
-byte pwmPrescaler2 = 8; // 3936Hz
+byte pwmPrescaler2 = 8; // 8 = 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
@@ -1216,7 +1216,7 @@ boolean HP = false;
 int vehicleNumber = 10;
 
 // Vehicle type
-byte vehicleType = 0;
+byte vehicleType = 5; // MRSC Vehicle!
 
 // Lights
 boolean tailLights = false;

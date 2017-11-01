@@ -91,6 +91,11 @@ New in V 2.31
  New in V 2.32
  - Flickering headlights bug in vehicleType 5 fixed
  - The accelerometer vectors are not processed anymore in vehicleType 5. This is only required for the self balancing robot (vehicleType 4)
+ 
+ New in V 2.4
+ - The I2C bus is scanned for an MPU-6050 sensor during the setup() sequence. The vehicleType is automatically changed to 0 (car without MRSC), if no sensor is detected.
+ - This means, that a car with vehicleType 5 (MRSC Stability Control) can now also be used without an MPU-6050 plugged in.
+ - Note, that the self balancing mode (vehicleType 4) always requires an MPU-6050. Otherwise the receiver will not start.
 
 ## Usage
 
