@@ -96,6 +96,9 @@ New in V 2.31
  - The I2C bus is scanned for an MPU-6050 sensor during the setup() sequence. The vehicleType is automatically changed to 0 (car without MRSC), if no sensor is detected.
  - This means, that a car with vehicleType 5 (MRSC Stability Control) can now also be used without an MPU-6050 plugged in.
  - Note, that the self balancing mode (vehicleType 4) always requires an MPU-6050. Otherwise the receiver will not start.
+ 
+ New in V 2.41
+ - The "indicators" variable is now locked and can't be enabled, if the SDA and SCL pins are in use for the MPU-6050 sensor. This is the case in vehicleMode 4 and 5.
 
 ## Usage
 

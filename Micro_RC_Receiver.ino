@@ -7,7 +7,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.4; // Software revision
+const float codeVersion = 2.41; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -210,13 +210,15 @@ void setup() {
 #endif
 
 #ifndef DEBUG
-Serial.end(); // make sure, serial is off!
-UCSR0B = 0b00000000;
+  Serial.end(); // make sure, serial is off!
+  UCSR0B = 0b00000000;
 #endif
 
   R2D2_tell();
 
   // LED setup
+  if (vehicleType == 4 || vehicleType == 5 ) indicators = false; // Indicators use the same pins as the MPU-6050, so they can't be used in vehicleType 4 or 5!
+
   if (tailLights) tailLight.begin(A1); // A1 = Servo 2 Pin
   if (headLights) headLight.begin(0); // 0 = RXI Pin
   if (indicators) {
@@ -262,77 +264,77 @@ UCSR0B = 0b00000000;
 //
 
 void led() {
-  
-    // Lights are switching off 10s after the vehicle did stop
-    if (millis() - millisLightOff >= 10000) {
-      headLight.off(); // Headlight off
-      tailLight.off(); // Taillight off
-      beaconLights.off(); // Beacons off
+
+  // Lights are switching off 10s after the vehicle did stop
+  if (millis() - millisLightOff >= 10000) {
+    headLight.off(); // Headlight off
+    tailLight.off(); // Taillight off
+    beaconLights.off(); // Beacons off
+  }
+  else {
+    if (!HP && Motor1.brakeActive() || HP && Motor2.brakeActive()) { // if braking detected from TB6612FNG motor driver
+      tailLight.on(); // Brake light (full brightness)
     }
     else {
-      if (!HP && Motor1.brakeActive() || HP && Motor2.brakeActive()) { // if braking detected from TB6612FNG motor driver
-        tailLight.on(); // Brake light (full brightness)
-      }
-      else {
-        tailLight.flash(10, 14, 0, 0); // Taillight: 10 on  / 14 off = about 40% brightness (soft PWM)
-      }
-      beaconLights.flash(50, 650, 0, 0); // Simulate rotating beacon lights with short flashes
-      headLight.on(); // Headlight on
+      tailLight.flash(10, 14, 0, 0); // Taillight: 10 on  / 14 off = about 40% brightness (soft PWM)
+    }
+    beaconLights.flash(50, 650, 0, 0); // Simulate rotating beacon lights with short flashes
+    headLight.on(); // Headlight on
+  }
+
+  // Indicator lights ----
+  if (indicators) {
+    // Set and reset by lever
+    if (data.axis4 < 5) left = true;
+    if (data.axis4 > 55) left = false;
+
+    if (data.axis4 > 95) right = true;
+    if (data.axis4 < 45) right = false;
+
+    // Reset by steering
+    static int steeringOld;
+
+    if (data.axis1 > steeringOld + 10) {
+      left = false;
+      steeringOld = data.axis1;
     }
 
-    // Indicator lights ----
-    if (indicators) {
-      // Set and reset by lever
-      if (data.axis4 < 5) left = true;
-      if (data.axis4 > 55) left = false;
-
-      if (data.axis4 > 95) right = true;
-      if (data.axis4 < 45) right = false;
-
-      // Reset by steering
-      static int steeringOld;
-
-      if (data.axis1 > steeringOld + 10) {
-        left = false;
-        steeringOld = data.axis1;
-      }
-
-      if (data.axis1 < steeringOld - 10) {
-        right = false;
-        steeringOld = data.axis1;
-      }
-
-      // Lights
-      if (left) { // Left indicator
-        right = false;
-        indicatorL.flash(375, 375, 0, 0);
-        indicatorR.off();
-      }
-
-      if (right) { // Right indicator
-        left = false;
-        indicatorR.flash(375, 375, 0, 0);
-        indicatorL.off();
-      }
-
-      if (hazard) { // Hazard lights
-        if (left) {
-          left = false;
-          indicatorL.off();
-        }
-        if (right) {
-          right = false;
-          indicatorR.off();
-        }
-        indicatorL.flash(375, 375, 0, 0);
-        indicatorR.flash(375, 375, 0, 0);
-      }
-
-      if (!hazard && !left && !right) {
-        indicatorL.off();
-        indicatorR.off();
-      }
+    if (data.axis1 < steeringOld - 10) {
+      right = false;
+      steeringOld = data.axis1;
     }
+
+    // Lights
+    if (left) { // Left indicator
+      right = false;
+      indicatorL.flash(375, 375, 0, 0);
+      indicatorR.off();
+    }
+
+    if (right) { // Right indicator
+      left = false;
+      indicatorR.flash(375, 375, 0, 0);
+      indicatorL.off();
+    }
+
+    if (hazard) { // Hazard lights
+      if (left) {
+        left = false;
+        indicatorL.off();
+      }
+      if (right) {
+        right = false;
+        indicatorR.off();
+      }
+      indicatorL.flash(375, 375, 0, 0);
+      indicatorR.flash(375, 375, 0, 0);
+    }
+
+    if (!hazard && !left && !right) {
+      indicatorL.off();
+      indicatorR.off();
+    }
+  }
 }
 
 //

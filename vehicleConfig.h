@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_PORSCHE // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_CHALLENGER // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -25,17 +25,17 @@
 
   // Vehicle type
   byte vehicleType;
-  0 = car (see: https://www.youtube.com/watch?v=A0SoK7KJxyc)
+  0 = car (see: https://www.youtube.com/watch?v=A0SoK7KJxyc). Use this mode, if you want to use indicators. No MPU-6050 MRSC support.
   1 = semi caterpillar, 2 = caterpillar (see: https://www.youtube.com/watch?v=Tjikm6hJ8hQ)
   3 = forklift (see: https://www.youtube.com/watch?v=3iXL9WvE4ro)
   4 = balancing (see: https://www.youtube.com/watch?v=zse9-l2Yo3Y)
-  5 = car with MRSC (Micro RC Stability Control. Similar with ABS, ESP, Traxxas Stability Management TSM) Potentiometer on A6 input of
-  your transmitter required! (see: https://www.youtube.com/watch?v=IPve7QpdLBc&t=5s)
+  5 = car with MRSC (Micro RC Stability Control). Similar with ABS, ESP, Traxxas Stability Management TSM. Potentiometer on A6 input of
+  your transmitter required! (see: https://www.youtube.com/watch?v=IPve7QpdLBc&t=5s) Indicators can't be used in this mode (locked)!
 
-  // Lights (see: https://www.youtube.com/watch?v=qbhPqHdBz3o)
+  // Lights (see: https://www.youtube.com/watch?v=qbhPqHdBz3o , https://www.youtube.com/watch?v=wBTfsIk4vkU&t=84s)
   boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"
   boolean headLights; // Caution: the headlights are wired to the RXI pin! -> Serial not usable, if "true"
-  boolean indicators; // Caution: the indicators are wired to the SDA / SCL pins! -> I2C (self balancing) not usable, if "true"
+  boolean indicators; // Caution: the indicators are wired to the SDA / SCL pins! -> not usable, if vehicleType is 4 or 5 (locked)
   boolean beacons; // Caution: the beacons are wired to the servo pin 4! -> Servo 4 not usable, if "true"
 
   // Servo limits (45 - 135 means - 45° to 45° from the servo middle position)
