@@ -102,6 +102,9 @@ New in V 2.31
 
 ## Usage
 
-See pictures in this repo
+See pictures
+![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/1.jpg)
+![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/2.jpg)
+![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/3.jpg)
 
 (c) 2016 - 2017 TheDIYGuy999
