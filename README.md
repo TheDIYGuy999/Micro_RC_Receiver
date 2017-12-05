@@ -108,10 +108,9 @@ See pictures
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/3.jpg)
 
 Receiver
-
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/Micro_RC_Receiver.png)
-MPU-6050 shield
 
+MPU-6050 shield
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/MPU-6050_Shield.png)
 
 (c) 2016 - 2017 TheDIYGuy999
