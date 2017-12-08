@@ -99,6 +99,11 @@ New in V 2.31
  
  New in V 2.41
  - The "indicators" variable is now locked and can't be enabled, if the SDA and SCL pins are in use for the MPU-6050 sensor. This is the case in vehicleMode 4 and 5.
+ 
+ New in V 2.5
+ - The MRSC stability control is now also working for cars without a steering servo
+ - Code was added to control a DC steering motor (as found in cheap RC cars) in accordance with the MPU-6050 yaw rate
+ - This is for example very useful for Coke Can Cars
 
 ## Usage
 

@@ -7,7 +7,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.41; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 2.5; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -463,7 +463,9 @@ void driveMotorsCar() {
     if (Motor1.drive(data.axis3, minPWM, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
       millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
     }
-    Motor2.drive(data.axis1, 0, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+    if (vehicleType != 5) { // If not car with MSRC stabilty control
+      Motor2.drive(data.axis1, 0, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+    }
   }
   else { // High Power "HP" version. Motor 2 is the dirving motor, no motor 1: ----
     if (Motor2.drive(data.axis3, minPWM, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
@@ -671,7 +673,7 @@ void balancing() {
 // =======================================================================================================
 // MRSC (MICRO RC STABILITY CONTROL) CALCULATIONS
 // =======================================================================================================
-//
+// For cars with stability control (steering overlay depending on gyro yaw rate)
 
 void mrsc() {
 
@@ -683,10 +685,15 @@ void mrsc() {
   int turnRateMeasured = yaw_rate * abs(data.axis3 - 50); // degrees/s * speed
   int steeringAngle = turnRateSetPoint + (turnRateMeasured * data.pot1 / 100);  // Compensation depending on the pot value
 
-  steeringAngle = constrain (steeringAngle, -50, 50);
+  steeringAngle = constrain (steeringAngle, -50, 50); // range = -50 to 50
 
   // Control steering servo
   servo1.write(map(steeringAngle, 50, -50, lim1L, lim1R) ); // 45 - 135°
+
+  // Control motor 2 (steering, not on "High Power" board type)
+  if (!HP) {
+    Motor2.drive((steeringAngle + 50), 0, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
+  }
 
   // Control motors
   driveMotorsCar();

@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_CHALLENGER // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_FIESTA // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -310,7 +310,7 @@ boolean HP = true; // High Power Board!
 int vehicleNumber = 1;
 
 // Vehicle type
-byte vehicleType = 0;
+byte vehicleType = 5; // MRSC vehicle!
 
 // Lights
 boolean tailLights = false;
@@ -704,7 +704,7 @@ boolean HP = false;
 int vehicleNumber = 6;
 
 // Vehicle type
-byte vehicleType = 0;
+byte vehicleType = 5;
 
 // Lights
 boolean tailLights = false;
