@@ -103,7 +103,7 @@ New in V 2.31
  New in V 2.5
  - The MRSC stability control is now also working for cars without a steering servo
  - Code was added to control a DC steering motor (as found in cheap RC cars) in accordance with the MPU-6050 yaw rate
- - This is for example very useful for Coke Can Cars
+ - This is for example very useful for Coke Can Cars. See: https://www.youtube.com/watch?v=jr5yYBal3vk
 
 ## Usage
 
