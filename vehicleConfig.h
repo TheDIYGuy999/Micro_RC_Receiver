@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_FIESTA // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_MECCANO_6953 // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -31,6 +31,10 @@
   4 = balancing (see: https://www.youtube.com/watch?v=zse9-l2Yo3Y)
   5 = car with MRSC (Micro RC Stability Control). Similar with ABS, ESP, Traxxas Stability Management TSM. Potentiometer on A6 input of
   your transmitter required! (see: https://www.youtube.com/watch?v=IPve7QpdLBc&t=5s) Indicators can't be used in this mode (locked)!
+
+  // MRSC
+  #define MRSC_FIXED // Only use this definition, if you want to use an MRSC vehicle without a gain adjustment pot on your transmitter
+  byte mrscGain = 25; // 25%
 
   // Lights (see: https://www.youtube.com/watch?v=qbhPqHdBz3o , https://www.youtube.com/watch?v=wBTfsIk4vkU&t=84s)
   boolean tailLights; // Caution: the taillights are wired to the servo pin 2! -> Servo 2 not usable, if "true"
@@ -90,6 +94,7 @@ int vehicleNumber = 1;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
@@ -128,62 +133,6 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
-// MECCANO V1.2 standard configuration-----------------------------------------------------------------
-#ifdef CONFIG_MECCANO_V12
-// Battery type
-boolean liPo = false;
-boolean cutoffVoltage = 3.3;
-
-// Board type
-float boardVersion = 1.2;
-boolean HP = false;
-
-// Vehicle address
-int vehicleNumber = 1;
-
-// Vehicle type
-byte vehicleType = 0;
-
-// Lights
-boolean tailLights = false;
-boolean headLights = true;
-boolean indicators = true;
-boolean beacons = false;
-
-// Servo limits
-byte lim1L = 45, lim1R = 135;
-byte lim2L = 45, lim2R = 135;
-byte lim3L = 45, lim3R = 135;
-byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
-byte lim4L = 45, lim4R = 135;
-
-// Motor configuration
-int maxPWMfull = 255;
-int maxPWMlimited = 170;
-int minPWM = 0;
-int maxAccelerationFull = 3;
-int maxAccelerationLimited = 12;
-
-// Variables for self balancing (vehicleType = 4) only!
-float tiltCalibration = 0.0;
-
-// Steering configuration
-byte steeringTorque = 255;
-
-// Motor 2 PWM frequency
-byte pwmPrescaler2 = 32;
-
-// Additional Channels
-boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
-
-// Engine sound
-boolean engineSound = false;
-
-// Tone sound
-boolean toneOut = false;
-#endif
-
 // Generic configuration, board v1.3-------------------------------------------------------------------
 #ifdef CONFIG_GENERIC_V13
 // Battery type
@@ -201,6 +150,7 @@ int vehicleNumber = 1;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
@@ -257,6 +207,8 @@ int vehicleNumber = 1;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
+boolean escBrakeLights = true;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
@@ -264,6 +216,63 @@ boolean beacons = false;
 
 // Servo limits
 byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// Tamiya NEO Fighter Buggy -------------------------------------------------------------------
+#ifdef CONFIG_TAMIYA_FIGHTER
+// Battery type
+boolean liPo = false; // ESC provides protection
+float cutoffVoltage = 4.9; // Regulated 6.0V supply from the ESC
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 1;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 41, lim1R = 131; // R 41, L131
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 45, lim3R = 135;
 byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
@@ -313,6 +322,7 @@ int vehicleNumber = 1;
 byte vehicleType = 5; // MRSC vehicle!
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
@@ -369,6 +379,7 @@ int vehicleNumber = 1;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = false;
 boolean indicators = false;
@@ -408,6 +419,64 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
+// WLtoys 18429 Desert Buggy---------------------------------------------------------------------------
+#ifdef CONFIG_18429
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.45; // Regulated 5.0V supply from the ESC
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 2;
+
+// Vehicle type
+byte vehicleType = 5;
+
+// Lights
+boolean escBrakeLights = true;
+boolean tailLights = true;
+boolean headLights = true;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 130, lim1R = 75; // R125, L70 Steering reversed
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 115, lim3Rlow = 70; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = false;
+boolean TXO_toggle1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
 // Disney 95 "DINOCO"--------------------------------------------------------------------------------
 #ifdef CONFIG_DINOCO
 // Battery type
@@ -425,6 +494,7 @@ int vehicleNumber = 2;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
@@ -478,9 +548,14 @@ boolean HP = false;
 int vehicleNumber = 3;
 
 // Vehicle type
-byte vehicleType = 0;
+byte vehicleType = 5; // MRSC stability control
+
+// MRSC
+#define MRSC_FIXED
+byte mrscGain = 35; // 35%
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = false;
 boolean indicators = false;
@@ -537,6 +612,7 @@ int vehicleNumber = 3;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
@@ -593,6 +669,7 @@ int vehicleNumber = 4;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = true;
 boolean headLights = true;
 boolean indicators = true;
@@ -643,12 +720,13 @@ float boardVersion = 1.2;
 boolean HP = false;
 
 // Vehicle address
-int vehicleNumber = 5; // one car number 2 and one number 5!
+int vehicleNumber = 1; // one car number 1 and one number 5!
 
 // Vehicle type
 byte vehicleType = 5; // MRSC vehicle!
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
@@ -707,6 +785,7 @@ int vehicleNumber = 6;
 byte vehicleType = 5;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
@@ -764,6 +843,7 @@ int vehicleNumber = 6;
 byte vehicleType = 5; // MRSC vehicle!
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
@@ -821,6 +901,7 @@ int vehicleNumber = 6;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
@@ -878,6 +959,7 @@ int vehicleNumber = 7;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = false;
 boolean indicators = false;
@@ -934,6 +1016,7 @@ int vehicleNumber = 8;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = false;
 boolean indicators = false;
@@ -992,6 +1075,7 @@ int vehicleNumber = 8;
 byte vehicleType = 5; // MPU6050 module required!
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
@@ -1049,6 +1133,7 @@ int vehicleNumber = 8;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = false;
@@ -1102,10 +1187,11 @@ boolean HP = false;
 int vehicleNumber = 9;
 
 // Vehicle type
-byte vehicleType = 0;
+byte vehicleType = 5;
 
 // Lights
-boolean tailLights = false;
+boolean escBrakeLights = true;
+boolean tailLights = true;
 boolean headLights = true;
 boolean indicators = false;
 boolean beacons = false;
@@ -1113,8 +1199,8 @@ boolean beacons = false;
 // Servo limits
 byte lim1L = 125, lim1R = 70; // R125, L70 Steering reversed
 byte lim2L = 45, lim2R = 135;
-byte lim3L = 135, lim3R = 45; // ESC output signal reversed
-byte lim3Llow = 105, lim3Rlow = 75; // limited top speed angles!
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 115, lim3Rlow = 70; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -1162,6 +1248,7 @@ int vehicleNumber = 9;
 byte vehicleType = 0;
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
@@ -1219,16 +1306,17 @@ int vehicleNumber = 10;
 byte vehicleType = 5; // MRSC Vehicle!
 
 // Lights
-boolean tailLights = false;
+boolean escBrakeLights = true;
+boolean tailLights = true;
 boolean headLights = true;
 boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 80, lim1R = 125; // R80, L125 Steering reversed
+byte lim1L = 62, lim1R = 133; // R80, L125
 byte lim2L = 45, lim2R = 135;
-byte lim3L = 135, lim3R = 45; // ESC output signal reversed
-byte lim3Llow = 105, lim3Rlow = 75; // limited top speed angles!
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 115, lim3Rlow = 70; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
@@ -1276,6 +1364,7 @@ int vehicleNumber = 10;
 byte vehicleType = 3; // Forklift mode
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
@@ -1332,6 +1421,7 @@ int vehicleNumber = 10;
 byte vehicleType = 2; // 2 = caterpillar mode
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = false;
 boolean indicators = false;
@@ -1389,6 +1479,7 @@ int vehicleNumber = 10;
 byte vehicleType = 2; // 2 = caterpillar mode
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
@@ -1446,6 +1537,7 @@ int vehicleNumber = 10;
 byte vehicleType = 4; // 4 = balancing mode
 
 // Lights
+boolean escBrakeLights = false;
 boolean tailLights = false;
 boolean headLights = false;
 boolean indicators = false;
@@ -1477,6 +1569,294 @@ byte pwmPrescaler2 = 32;
 // Additional Channels
 boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = false;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// MECCEISO'S MECCANO VEHICLES ***********************************************************************************
+// https://www.youtube.com/channel/UCuzV4gX5T-5FzYAQXltWYnA ******************************************************
+
+// MECCANO V1.2 standard configuration-----------------------------------------------------------------
+#ifdef CONFIG_MECCANO_V12
+// Battery type
+boolean liPo = false;
+boolean cutoffVoltage = 3.3;
+
+// Board type
+float boardVersion = 1.2;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 1;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 115, lim3Rlow = 70; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+int maxAccelerationFull = 3;
+int maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// MECCAPILLAR-----------------------------------------------------------------
+#ifdef CONFIG_MECCAPILLAR
+// Battery type
+boolean liPo = false;
+boolean cutoffVoltage = 3.5;
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 1;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 45, lim3Rlow = 135; // no limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+int maxAccelerationFull = 3;
+int maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// MECCANO CRANE CHASSIS-----------------------------------------------------------------
+#ifdef CONFIG_CRANE_CHASSIS
+// Battery type
+boolean liPo = false; // ESC provides protection
+boolean cutoffVoltage = 3.5;
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 3;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 135, lim1R = 45; // Steering reversed
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 115, lim3Rlow = 70; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+int maxAccelerationFull = 3;
+int maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// MECCANO CRANE TOWER-----------------------------------------------------------------
+#ifdef CONFIG_CRANE_TOWER
+// Battery type
+boolean liPo = false;
+boolean cutoffVoltage = 3.5;
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 4;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 45, lim3Rlow = 135; // no limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+int maxAccelerationFull = 3;
+int maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = true;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// MECCANO CAR 5-----------------------------------------------------------------
+#ifdef CONFIG_MECCANO_CAR_5
+// Battery type
+boolean liPo = false; // ESC provides protection
+boolean cutoffVoltage = 3.5;
+
+// Board type
+float boardVersion = 1.2;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 5;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 135, lim1R = 45; // Steering reversed
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 115, lim3Rlow = 70; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+int maxAccelerationFull = 3;
+int maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
 boolean potentiometer1 = true;
 
 // Engine sound

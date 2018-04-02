@@ -104,6 +104,12 @@ New in V 2.31
  - The MRSC stability control is now also working for cars without a steering servo
  - Code was added to control a DC steering motor (as found in cheap RC cars) in accordance with the MPU-6050 yaw rate
  - This is for example very useful for Coke Can Cars. See: https://www.youtube.com/watch?v=jr5yYBal3vk
+ 
+ New in V 2.6
+ - The MRSC stability control can now be used with transmitters without gain adjustment potentiometer
+ - The following optional parameters in the vehicleconfig.h allow to use a fixed gain: MRSC_FIXED, mrscGain
+ - Allows to add an MPU-6050 gyro to every vehicle. So we always have a closed loop steering control, even without a proper servo with potentiometer feedback
+ - On the "Non-High-Power" receiver model, 0.3V battery voltage are not added anymore during driving. This is not useful, if there is not much current draw.
 
 ## Usage
 

@@ -7,7 +7,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.5; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 2.6; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -263,6 +263,38 @@ void setup() {
 // =======================================================================================================
 //
 
+// Brake light subfunction for ESC vehicles
+boolean escBrakeActive() {
+  static byte driveState;
+  boolean brake;
+
+  switch (driveState) { // 0 = neutral, 1 = forward, 2 = reverse, 3 = brake
+
+    case 0: // neutral
+      if (data.axis3 > 55) driveState = 1; // forward
+      if (data.axis3 < 45) driveState = 2; // reverse
+      brake = false;
+      break;
+
+    case 1: // forward
+      if (data.axis3 < 45) driveState = 3; // brake
+      brake = false;
+      break;
+
+    case 2: // reverse
+      if (data.axis3 > 55) driveState = 1; // forward
+      brake = false;
+      break;
+
+    case 3: // brake
+      if (data.axis3 > 45) driveState = 2; // go to reverse, if above neutral
+      brake = true;
+      break;
+
+  }
+  return brake;
+}
+
 void led() {
 
   // Lights are switching off 10s after the vehicle did stop
@@ -272,9 +304,14 @@ void led() {
     beaconLights.off(); // Beacons off
   }
   else {
-    if (!HP && Motor1.brakeActive() || HP && Motor2.brakeActive()) { // if braking detected from TB6612FNG motor driver
+    if (!escBrakeLights && (!HP && Motor1.brakeActive() || HP && Motor2.brakeActive() )) { // if braking detected from TB6612FNG motor driver
       tailLight.on(); // Brake light (full brightness)
     }
+
+    else if (escBrakeLights && escBrakeActive() ) { // or braking detected from ESC
+      tailLight.on(); // Brake light (full brightness)
+    }
+
     else {
       tailLight.flash(10, 14, 0, 0); // Taillight: 10 on  / 14 off = about 40% brightness (soft PWM)
     }
@@ -680,6 +717,11 @@ void mrsc() {
   // Read sensor data
   readMpu6050Data();
 
+  // If the MRSC gain is a fixed value, read it!
+#ifdef MRSC_FIXED
+  data.pot1 = mrscGain;
+#endif
+
   // Compute steering compensation overlay
   int turnRateSetPoint = data.axis1 - 50;  // turnRateSetPoint = steering angle (0 to 100) - 50 = -50 to 50
   int turnRateMeasured = yaw_rate * abs(data.axis3 - 50); // degrees/s * speed
@@ -687,7 +729,7 @@ void mrsc() {
 
   steeringAngle = constrain (steeringAngle, -50, 50); // range = -50 to 50
 
-  // Control steering servo
+  // Control steering servo (MRSC mode only)
   servo1.write(map(steeringAngle, 50, -50, lim1L, lim1R) ); // 45 - 135°
 
   // Control motor 2 (steering, not on "High Power" board type)
@@ -793,7 +835,7 @@ float batteryAverage() {
   raw[3] = raw[2];
   raw[2] = raw[1];
   raw[1] = raw[0];
-  if (isDriving) raw[0] = (analogRead(BATTERY_DETECT_PIN) + 31); // add 0.3V while driving: 1023 steps * 0.3V / 9.9V = 31
+  if (isDriving && HP) raw[0] = (analogRead(BATTERY_DETECT_PIN) + 31); // add 0.3V while driving (HP version only): 1023 steps * 0.3V / 9.9V = 31
   else raw[0] = analogRead(BATTERY_DETECT_PIN); // else take the real voltage (compensates voltage drop while driving)
   float average = (raw[0] + raw[1] + raw[2] + raw[3] + raw[4] + raw[5]) / 619.999; // 1023steps / 9.9V * 6 = 619.999
   return average;
