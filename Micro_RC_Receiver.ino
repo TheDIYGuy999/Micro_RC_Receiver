@@ -7,7 +7,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.6; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 2.7; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -452,7 +452,12 @@ void writeServos() {
   }
 
   // Rudder
-  if (!beacons) servo4.write(map(data.axis4, 100, 0, lim4L, lim4R) ); // 45 - 135°
+  if (!potentiometer1) { // Servo 4 controlled by CH4
+    if (!beacons) servo4.write(map(data.axis4, 100, 0, lim4L, lim4R) ); // 45 - 135°
+  }
+  else { // Servo 4 controlled by transmitter potentiometer knob
+    if (!beacons) servo4.write(map(data.pot1, 0, 100, 45, 135) ); // 45 - 135°
+  }
 
   // Axis 2 on the joystick switches engine sound on servo channel 3 on and off!
   if (engineSound) {

@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_MECCANO_6953 // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_S_MAX // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -68,7 +68,7 @@
   // Additional Channels
   boolean TXO_momentary1; // The TXO output is linked to the momentary1 channel! -> Serial not usable, if "true"
   boolean TXO_toggle1; // The TXO output is linked to the toggle1 channel! -> Serial not usable, if "true"
-  boolean potentiometer1;
+  boolean potentiometer1; // The potentiometer knob on the transmitter is linked to the servo output CH4
 
   // Engine sound (see: https://www.youtube.com/watch?v=pPlrx9yVI6E)
   boolean engineSound; // true = a "TheDIYGuy999" engine simulator is wired to servo channel 3
@@ -124,7 +124,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -181,7 +181,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -239,7 +239,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -353,7 +353,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -410,7 +410,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -468,7 +468,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 // Additional Channels
 boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -525,7 +525,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -586,7 +586,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -643,7 +643,7 @@ byte pwmPrescaler2 = 1; // This a show car and we don't want PWM switching noise
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = true;
@@ -700,7 +700,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -759,7 +759,7 @@ byte pwmPrescaler2 = 32;
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -817,7 +817,7 @@ byte pwmPrescaler2 = 1; // We don't want PWM switching noise from the steering! 
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -875,7 +875,7 @@ byte pwmPrescaler2 = 8; // 8 = 3936Hz
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -990,7 +990,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1048,7 +1048,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1107,7 +1107,7 @@ byte pwmPrescaler2 = 1; // We don't want PWM switching noise from the steering! 
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1197,7 +1197,7 @@ boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 125, lim1R = 70; // R125, L70 Steering reversed
+byte lim1L = 125, lim1R = 80; // R125, L70 Steering reversed
 byte lim2L = 45, lim2R = 135;
 byte lim3L = 150, lim3R = 35; // ESC output signal reversed
 byte lim3Llow = 115, lim3Rlow = 70; // limited top speed angles!
@@ -1280,7 +1280,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1338,7 +1338,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 // Additional Channels
 boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1395,7 +1395,7 @@ byte pwmPrescaler2 = 32;
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1453,7 +1453,7 @@ byte pwmPrescaler2 = 32;
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1511,7 +1511,7 @@ byte pwmPrescaler2 = 32;
 // Additional Channels
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1569,7 +1569,7 @@ byte pwmPrescaler2 = 32;
 // Additional Channels
 boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1629,7 +1629,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1686,7 +1686,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1743,7 +1743,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1800,7 +1800,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1857,7 +1857,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;

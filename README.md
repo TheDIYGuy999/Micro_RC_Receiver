@@ -107,9 +107,14 @@ New in V 2.31
  
  New in V 2.6
  - The MRSC stability control can now be used with transmitters without gain adjustment potentiometer
- - The following optional parameters in the vehicleconfig.h allow to use a fixed gain: MRSC_FIXED, mrscGain
+ - The following optional parameters in the vehicleConfig.h allow to use a fixed gain: MRSC_FIXED, mrscGain
  - Allows to add an MPU-6050 gyro to every vehicle. So we always have a closed loop steering control, even without a proper servo with potentiometer feedback
  - On the "Non-High-Power" receiver model, 0.3V battery voltage are not added anymore during driving. This is not useful, if there is not much current draw.
+ 
+ New in V 2.7
+ - The MRSC stability control gain adjustment knob can now be linked to servo CH4, if "potentiometer1" is set to "true" in vehicleConfig.h
+ - This is useful, if an external MRSC stability control unit for 3pin servos is used. See: https://github.com/TheDIYGuy999/MRSC_Adapter_3Pin_Servo
+ - Servo CH4 is wired to pin 5 in this case. This allows to adjust the MRSC gain on the transmitter, just as with the internal MRSC stability control
 
 ## Usage
 
@@ -126,4 +131,4 @@ MPU-6050 shield
 
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/MPU-6050_Shield.png)
 
-(c) 2016 - 2017 TheDIYGuy999
+(c) 2016 - 2018 TheDIYGuy999
