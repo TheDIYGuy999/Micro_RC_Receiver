@@ -31,6 +31,16 @@ float curveFull[][2] = {
   , {100, 100}
 };
 
+// This array is intended for the "Differential Thrust" mode. The inner motor can max. slow down to 20% of the
+// outer motors RPM
+float curveThrust[][2] = {  // see excel sheet!
+  {0, 20} // {input value, output value}
+  , {25, 40}
+  , {50, 60}
+  , {75, 80}
+  , {100, 100}
+};
+
 //
 // =======================================================================================================
 // ARRAY INTERPOLATION

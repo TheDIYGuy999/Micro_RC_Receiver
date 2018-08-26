@@ -7,7 +7,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.7; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 2.8; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -186,8 +186,8 @@ void setupMotors() {
   Motor2.begin(motor2_in1, motor2_in2, motor2_pwm, 0, 100, 4, false); // Steering motor (Drive in "HP" version)
 
   // Motor PWM frequency prescalers (Requires the PWMFrequency.h library)
-  // Caterpillar vehicles: locked to 984Hz, to make sure, that both caterpillars use 984Hz.
-  if (vehicleType > 0 && vehicleType < 3) pwmPrescaler2 = 32;
+  // Differential steering vehicles: locked to 984Hz, to make sure, that both motors use 984Hz.
+  if (vehicleType == 1 || vehicleType == 2 || vehicleType == 6) pwmPrescaler2 = 32;
 
   // ----------- IMPORTANT!! --------------
   // Motor 1 always runs @ 984Hz PWM frequency and can't be changed, because timers 0 an 1 are in use for other things!
@@ -597,6 +597,11 @@ void driveMotorsSteering() {
   }
 
   // Nonlinear steering overlay correction
+  if (vehicleType == 6) {
+    steeringFactorLeft2 = reMap(curveThrust, steeringFactorLeft); // Differential thrust mode
+    steeringFactorRight2 = reMap(curveThrust, steeringFactorRight);
+    data.axis3 = constrain(data.axis3, 50, 100); // reverse locked!
+  }
   if (vehicleType == 2) {
     steeringFactorLeft2 = reMap(curveFull, steeringFactorLeft); // Caterpillar mode
     steeringFactorRight2 = reMap(curveFull, steeringFactorRight);

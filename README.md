@@ -115,6 +115,10 @@ New in V 2.31
  - The MRSC stability control gain adjustment knob can now be linked to servo CH4, if "potentiometer1" is set to "true" in vehicleConfig.h
  - This is useful, if an external MRSC stability control unit for 3pin servos is used. See: https://github.com/TheDIYGuy999/MRSC_Adapter_3Pin_Servo
  - Servo CH4 is wired to pin 5 in this case. This allows to adjust the MRSC gain on the transmitter, just as with the internal MRSC stability control
+ 
+ New in V 2.8
+ - Added support for differential thrust controlled airplanes
+ - First runway tests with a Piper J3 CUB from Banggood
 
 ## Usage
 
