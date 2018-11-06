@@ -7,7 +7,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.8; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 2.9; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -440,8 +440,16 @@ void writeServos() {
     servo1.write(map(data.axis1, 100, 0, lim1L, lim1R) ); // 45 - 135°
   }
 
-  // Elevator
+  // Elevator or shifting gearbox actuator
+#ifdef TWO_SPEED_GEARBOX // Shifting gearbox mode, controlled by "Mode 1" button
+  if (!tailLights) {
+    if (data.mode1)servo2.write(lim2L);
+    else servo2.write(lim2R);
+  }
+  
+#else // Servo controlled by joystick CH2
   if (!tailLights) servo2.write(map(data.axis2, 100, 0, lim2L, lim2R) ); // 45 - 135°
+#endif
 
   // Throttle (for ESC control, if you don't use the internal TB6612FNG motor driver)
   if (data.mode1) { // limited speed!

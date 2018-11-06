@@ -113,12 +113,17 @@ New in V 2.31
  
  New in V 2.7
  - The MRSC stability control gain adjustment knob can now be linked to servo CH4, if "potentiometer1" is set to "true" in vehicleConfig.h
- - This is useful, if an external MRSC stability control unit for 3pin servos is used. See: https://github.com/TheDIYGuy999/MRSC_Adapter_3Pin_Servo
+ - This is useful, if an external MRSC stability control unit for 3 pin servos is used. See: https://github.com/TheDIYGuy999/MRSC_Adapter_3Pin_Servo
  - Servo CH4 is wired to pin 5 in this case. This allows to adjust the MRSC gain on the transmitter, just as with the internal MRSC stability control
  
  New in V 2.8
  - Added support for differential thrust controlled airplanes
- - First runway tests with a Piper J3 CUB from Banggood
+ - Tested with a Piper J3 CUB from Banggood
+ 
+ New in V 2.9
+ - Added TWO_SPEED_GEARBOX option for mechanical two speed gearboxes, shifted by a servo, connected to CH2, controlled by "Mode 1" button
+ - Example see vehicle CONFIG_WPL_B-36
+ - See video: https://www.youtube.com/watch?v=EaOJE_GU5pk&t=1s
 
 ## Usage
 
