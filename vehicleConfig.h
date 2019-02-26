@@ -1,9 +1,10 @@
+
 #ifndef vehicleConfig_h
 #define vehicleConfig_h
 
 #include "Arduino.h"
 
-#define CONFIG_WPL_B-36 // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_JJRC_Q60 // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -1347,6 +1348,64 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
+// 1:12 MN Model Landrover Defender D90-------------------------------------------------
+#ifdef CONFIG_DEFENDER90
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 4.5; // 5V receiver supply voltage surveillance from BEC only!
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 8;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = true;
+boolean tailLights = true;
+boolean headLights = true;
+boolean indicators = true;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135; // R67  L137
+byte lim2L = 45, lim2R = 135; // Gearbox shifter limits (1. and 2. gear)
+byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
+byte lim3Llow = 80, lim3Rlow = 110; 
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
 // Remo Hobby S Max---------------------------------------------------------------------------
 #ifdef CONFIG_S_MAX
 // Battery type
@@ -1488,11 +1547,72 @@ boolean beacons = false;
 
 // Servo limits
 byte lim1L = 67, lim1R = 137; // R67  L137
-byte lim2L = 45, lim2R = 120; // Gearbox shifter limits (1. and 2. gear)
+byte lim2L = 43, lim2R = 120; // Gearbox shifter limits (1. and 2. gear)
 byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
 byte lim3Llow = 65, lim3Rlow = 125; // same setting (full throttle), because of shifting gearbox!
 byte lim4L = 45, lim4R = 135;
-#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2. Not usable in combination with the "tailLights" option
+#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// 1:16 JJRC Q60 (3D printed ZIL-131 body) Military Truck-------------------------------------------------
+#ifdef CONFIG_JJRC_Q60
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 4.5; // Original 6V NiCd battery pack or 2S LiPo, Receiver 5V supply from ESC
+
+// Board type
+float boardVersion = 1.2;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 10;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = true;
+boolean tailLights = true;
+boolean headLights = true;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 74, lim1R = 117; // R74  L117
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
+byte lim3Llow = 80, lim3Rlow = 110; 
+byte lim4L = 55, lim4R = 75; // Tractor trailer coupler unlocking limits (L = "Back / Pulse" button pressed)
+#define TRACTOR_TRAILER_UNLOCK // Vehicle has a trailer unlocking servo, switched by servo CH4.
+//Not usable in combination with the "beacons" and "potentiometer" option
 
 // Motor configuration
 int maxPWMfull = 255;

@@ -124,6 +124,12 @@ New in V 2.31
  - Added TWO_SPEED_GEARBOX option for mechanical two speed gearboxes, shifted by a servo, connected to CH2, controlled by "Mode 1" button
  - Example see vehicle CONFIG_WPL_B-36
  - See video: https://www.youtube.com/watch?v=EaOJE_GU5pk&t=1s
+ 
+ New in V 3.0
+ - Added TRACTOR_TRAILER_UNLOCK option. Used to operate the tractor trailer unlocking servo
+ - Press the "Back / Pulse" button to unlock your trailer
+ - See vehicle "CONFIG_JJRC_Q60" for example
+ - Parts for 3D printing: https://www.thingiverse.com/thing:3399449
 
 ## Usage
 

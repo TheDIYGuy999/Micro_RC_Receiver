@@ -7,7 +7,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 2.9; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 3.0; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -446,7 +446,7 @@ void writeServos() {
     if (data.mode1)servo2.write(lim2L);
     else servo2.write(lim2R);
   }
-  
+
 #else // Servo controlled by joystick CH2
   if (!tailLights) servo2.write(map(data.axis2, 100, 0, lim2L, lim2R) ); // 45 - 135°
 #endif
@@ -459,13 +459,21 @@ void writeServos() {
     servo3.write(map(data.axis3, 100, 0, lim3L, lim3R) ); // 45 - 135°
   }
 
-  // Rudder
+  // Rudder or trailer unlock actuator
+#ifdef TRACTOR_TRAILER_UNLOCK // Tractor trailer unlocking, controlled by "Momentary 1" ("Back / Pulse") button
+  if (!beacons && !potentiometer1) {
+    if (data.momentary1)servo4.write(lim4L);
+    else servo4.write(lim4R);
+  }
+
+#else // Servo controlled by joystick CH4 
   if (!potentiometer1) { // Servo 4 controlled by CH4
     if (!beacons) servo4.write(map(data.axis4, 100, 0, lim4L, lim4R) ); // 45 - 135°
   }
   else { // Servo 4 controlled by transmitter potentiometer knob
     if (!beacons) servo4.write(map(data.pot1, 0, 100, 45, 135) ); // 45 - 135°
   }
+#endif
 
   // Axis 2 on the joystick switches engine sound on servo channel 3 on and off!
   if (engineSound) {
