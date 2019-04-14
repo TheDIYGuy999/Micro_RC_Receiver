@@ -525,7 +525,7 @@ void driveMotorsCar() {
       Motor2.drive(data.axis1, 0, steeringTorque, 0, false); // The steering motor (if the original steering motor is reused instead of a servo)
     }
   }
-  else { // High Power "HP" version. Motor 2 is the dirving motor, no motor 1: ----
+  else { // High Power "HP" version. Motor 2 is the driving motor, no motor 1: ----
     if (Motor2.drive(data.axis3, minPWM, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
       millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
     }
@@ -897,4 +897,3 @@ void loop() {
   // LED
   led();
 }
-

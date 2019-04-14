@@ -4,7 +4,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_JJRC_Q60 // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_HG_P407 // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -582,6 +582,63 @@ byte steeringTorque = 255;
 
 // Motor 2 PWM frequency
 byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// HG P407 Tamiya Bruiser Clone-------------------------------------------------------------------
+#ifdef CONFIG_HG_P407
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 3.6;
+
+// Board type
+float boardVersion = 1.5;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 3;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 155, lim1R = 65; // Steering R 155, L 65
+byte lim2L = 80, lim2R = 137; // 3 speed gearbox shifting servo 80 3 gear., 137 1 gear.
+byte lim3L = 135, lim3R = 45;
+byte lim3Llow = 105, lim3Rlow = 75; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
