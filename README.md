@@ -130,6 +130,11 @@ New in V 2.31
  - Press the "Back / Pulse" button to unlock your trailer
  - See vehicle "CONFIG_JJRC_Q60" for example
  - Parts for 3D printing: https://www.thingiverse.com/thing:3399449
+ 
+ New in V 3.1
+ - Added THRE_SPEED_GEARBOX option for mechanical three speed gearboxes, shifted by a servo, connected to CH2, controlled by a 3 position switch, connected to CH2 Joystick input of the transmitter. A 10k resistor is reqired between GND and the input pin as well as between the input pin and VCC
+ - Three individual servo positions can be programmed: lim2L, lim2C, lim2R
+ - Example see vehicle CONFIG_HG_P407
 
 ## Usage
 
@@ -146,4 +151,4 @@ MPU-6050 shield
 
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/MPU-6050_Shield.png)
 
-(c) 2016 - 2018 TheDIYGuy999
+(c) 2016 - 2019 TheDIYGuy999

@@ -7,7 +7,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 3.0; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 3.1; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -447,8 +447,17 @@ void writeServos() {
     else servo2.write(lim2R);
   }
 
+#else
+#ifdef THREE_SPEED_GEARBOX // Shifting gearbox mode, controlled by 3 position switch
+  if (!tailLights) {
+    if (data.axis2 < 10)servo2.write(lim2R);
+    else if (data.axis2 > 90)servo2.write(lim2L);
+    else servo2.write(lim2C);
+  }
+
 #else // Servo controlled by joystick CH2
   if (!tailLights) servo2.write(map(data.axis2, 100, 0, lim2L, lim2R) ); // 45 - 135°
+#endif
 #endif
 
   // Throttle (for ESC control, if you don't use the internal TB6612FNG motor driver)

@@ -46,11 +46,12 @@
 
   // Servo limits (45 - 135 means - 45° to 45° from the servo middle position)
   byte lim1L, lim1R; // Servo 1
-  byte lim2L, lim2R;
+  byte lim2L, lim2C, lim2R; // Lim2C for THREE_SPEED_GEARBOX option (center position)
   byte lim3L, lim3R;
   byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles for external ESC
-  byte lim4L, lim4R; // Servo 4
+  byte lim4L, lim4R; // Servo 4, also used for tractor trailer unlocking servo (TRACTOR_TRAILER_UNLOCK option)
   #define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2. Not usable in combination with the "tailLights" option
+  #define THREE_SPEED_GEARBOX // Vehicle has a mechanical 3 speed shifting gearbox, switched by servo CH2. Not usable in combination with the "tailLights" option
 
   // Motor configuration
   int maxPWMfull; // (100% PWM is 255)
@@ -619,10 +620,12 @@ boolean beacons = false;
 
 // Servo limits
 byte lim1L = 155, lim1R = 65; // Steering R 155, L 65
-byte lim2L = 80, lim2R = 137; // 3 speed gearbox shifting servo 80 3 gear., 137 1 gear.
+byte lim2L = 71, lim2C = 106, lim2R = 146; // 3 speed gearbox shifting servo 71 = 3. gear., 142 = 1. gear.
 byte lim3L = 135, lim3R = 45;
 byte lim3Llow = 105, lim3Rlow = 75; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
+#define THREE_SPEED_GEARBOX // Vehicle has a mechanical 3 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
 
 // Motor configuration
 int maxPWMfull = 255;
@@ -883,6 +886,65 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
+// WPL C34KM Toyota FJ40 Land Cruiser-------------------------------------------------------------------
+#ifdef CONFIG_C34
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 4.5; // 5V receiver supply voltage surveillance from BEC only!
+
+// Board type
+float boardVersion = 1.5;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 4;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 60, lim1R = 145; // R60, L145
+byte lim2L = 120, lim2R = 65; // Gearbox shifter limits (1. and 2. gear)
+byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
+byte lim3Llow = 65, lim3Rlow = 125; // same setting (full throttle), because of shifting gearbox!
+byte lim4L = 45, lim4R = 135;
+#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
 // GearGmax / KIDZTECH TOYS Porsche GT3 RS 4.0--------------------------------------------------------
 #ifdef CONFIG_PORSCHE
 // Battery type
@@ -1000,37 +1062,48 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
-// Ferrari 458 Italia---------------------------------------------------------------------------
-#ifdef CONFIG_458
+// WPL B24 GAZ-66-------------------------------------------------
+#ifdef CONFIG_GAZ-66
 // Battery type
 boolean liPo = true;
-float cutoffVoltage = 3.6;
+float cutoffVoltage = 4.5; // 5V receiver supply voltage surveillance from BEC only!
 
 // Board type
 float boardVersion = 1.3;
-boolean HP = true; // High Power Board!
+boolean HP = true;
 
 // Vehicle address
-int vehicleNumber = 6;
+int vehicleNumber = 5;
 
 // Vehicle type
-byte vehicleType = 5; // MRSC vehicle!
+byte vehicleType = 0;
 
 // Lights
-boolean escBrakeLights = false;
+boolean escBrakeLights = true;
 boolean tailLights = false;
 boolean headLights = true;
-boolean indicators = false;
+boolean indicators = true;
 boolean beacons = false;
 
-// Servo limits
-byte lim1L = 146, lim1R = 23; // R146 L23
-byte lim2L = 45, lim2R = 135;
-byte lim3L = 45, lim3R = 135;
-byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
-byte lim4L = 45, lim4R = 135;
+// Servo limits ----
+// Steering
+byte lim1L = 57, lim1R = 123; // R57  L123
 
-// Motor configuration
+// Throttle
+byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
+byte lim3Llow = 65, lim3Rlow = 125; // same setting (full throttle), because of shifting gearbox!
+
+// Horn impulse (wired to Das Mikro TBS-Micro input "Prop 2")
+byte lim4L = 135, lim4R = 90; // Generating 90° (neutral) servo position, if switch released and 135°, if pressed
+#define TRACTOR_TRAILER_UNLOCK // TRACTOR_TRAILER_UNLOCK used for 3 position toggle switch.
+//Not usable in combination with the "beacons" and "potentiometer" option
+
+// Gearbox shifting
+byte lim2L = 43, lim2R = 120; // Gearbox shifter limits (1. and 2. gear)
+#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
+
+// Motor configuration ----
 int maxPWMfull = 255;
 int maxPWMlimited = 170;
 int minPWM = 0;
@@ -1044,7 +1117,7 @@ float tiltCalibration = 0.0;
 byte steeringTorque = 255;
 
 // Motor 2 PWM frequency
-byte pwmPrescaler2 = 8; // 8 = 3936Hz
+byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
@@ -1213,6 +1286,66 @@ byte maxAccelerationLimited = 12;
 
 // Variables for self balancing (vehicleType = 4) only!
 float tiltCalibration = 0.0;
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// 1:12 MN Model Landrover Defender D90 Brushless with 2 speed transmission---------------------------------
+#ifdef CONFIG_BRUSHLESS_D90
+// Battery type
+boolean liPo = true;
+float cutoffVoltage = 4.5; // 5V receiver supply voltage surveillance from BEC only!
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 7;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = true;
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 75, lim1R = 130; // R65  L120
+byte lim2L = 10, lim2R = 120; // Gearbox shifter limits (1. and 2. gear)
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 150, lim3Rlow = 35; // same setting (full throttle), because of shifting gearbox!
+byte lim4L = 45, lim4R = 135;
+#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
 // Steering configuration
 byte steeringTorque = 255;
 
@@ -1423,17 +1556,19 @@ byte vehicleType = 0;
 
 // Lights
 boolean escBrakeLights = true;
-boolean tailLights = true;
+boolean tailLights = false;
 boolean headLights = true;
 boolean indicators = true;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 45, lim1R = 135; // R67  L137
-byte lim2L = 45, lim2R = 135; // Gearbox shifter limits (1. and 2. gear)
+byte lim1L = 55, lim1R = 125; // R50  L130
+byte lim2L = 43, lim2R = 120; // Gearbox shifter limits (1. and 2. gear)
 byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
-byte lim3Llow = 80, lim3Rlow = 110; 
+byte lim3Llow = 65, lim3Rlow = 125; // same setting (full throttle), because of shifting gearbox!
 byte lim4L = 45, lim4R = 135;
+#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
 
 // Motor configuration
 int maxPWMfull = 255;
