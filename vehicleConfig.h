@@ -4,7 +4,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_HG_P407 // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_WPL_B-36 // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -128,6 +128,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -185,6 +186,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -243,6 +245,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -300,6 +303,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = true;
 
 // Engine sound
@@ -357,6 +361,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -414,6 +419,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -471,6 +477,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = true;
 
 // Engine sound
@@ -586,6 +593,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -620,7 +628,7 @@ boolean beacons = false;
 
 // Servo limits
 byte lim1L = 155, lim1R = 65; // Steering R 155, L 65
-byte lim2L = 71, lim2C = 106, lim2R = 146; // 3 speed gearbox shifting servo 71 = 3. gear., 142 = 1. gear.
+byte lim2L = 71, lim2C = 106, lim2R = 146; // 3 speed gearbox shifting servo 71 = 3. gear, 106 2. gear, 146 = 1. gear.
 byte lim3L = 135, lim3R = 45;
 byte lim3Llow = 105, lim3Rlow = 75; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
@@ -645,6 +653,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -702,6 +711,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = true;
 
 // Engine sound
@@ -763,6 +773,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -820,6 +831,7 @@ byte pwmPrescaler2 = 1; // This a show car and we don't want PWM switching noise
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -877,6 +889,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -936,6 +949,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -1529,6 +1543,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = true; // true = MRSC knob linked to servo CH4!
 
 // Engine sound
@@ -1718,7 +1733,7 @@ boolean toneOut = false;
 #ifdef CONFIG_WPL_B-36
 // Battery type
 boolean liPo = false;
-float cutoffVoltage = 4.5; // 5V receiver supply voltage surveillance from BEC only!
+float cutoffVoltage = 0.0; // 6V receiver supply voltage, but Sound module causes a lot of noise!
 
 // Board type
 float boardVersion = 1.2;
@@ -1738,10 +1753,10 @@ boolean indicators = true;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 67, lim1R = 137; // R67  L137
+byte lim1L = 64, lim1R = 137; // R67  L137
 byte lim2L = 43, lim2R = 120; // Gearbox shifter limits (1. and 2. gear)
-byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
-byte lim3Llow = 65, lim3Rlow = 125; // same setting (full throttle), because of shifting gearbox!
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 150, lim3Rlow = 35; // 2 speed transmission, so same values!
 byte lim4L = 45, lim4R = 135;
 #define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
 // Not usable in combination with the "tailLights" option
@@ -1763,8 +1778,8 @@ byte steeringTorque = 255;
 byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
-boolean TXO_momentary1 = true;
-boolean TXO_toggle1 = false;
+boolean TXO_momentary1 = false;
+boolean TXO_toggle1 = true;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -2232,6 +2247,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -2289,6 +2305,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -2346,6 +2363,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -2403,6 +2421,7 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -2412,7 +2431,7 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
-// MECCANO CAR 5-----------------------------------------------------------------
+// MECCANO CAR 5 Willys Jeep -----------------------------------------------------------
 #ifdef CONFIG_MECCANO_CAR_5
 // Battery type
 boolean liPo = false; // ESC provides protection
@@ -2460,6 +2479,65 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// MECCANO CAR 6 with JMT-10A ESC-------------------------------------------------------
+#ifdef CONFIG_MECCANO_CAR_6
+// Battery type
+boolean liPo = true; // Unprotected ESC!
+float cutoffVoltage = 4.5; // 2S LiPo, Receiver 5V supply from ESC
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 6;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 45, lim1R = 135; // Steering reversed
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
+byte lim3Llow = 80, lim3Rlow = 110; 
+byte lim4L = 45, lim4R = 135;
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+int maxAccelerationFull = 3;
+int maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 32;
+
+// Additional Channels
+boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound

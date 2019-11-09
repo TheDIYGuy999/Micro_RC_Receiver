@@ -135,6 +135,11 @@ New in V 2.31
  - Added THRE_SPEED_GEARBOX option for mechanical three speed gearboxes, shifted by a servo, connected to CH2, controlled by a 3 position switch, connected to CH2 Joystick input of the transmitter. A 10k resistor is reqired between GND and the input pin as well as between the input pin and VCC
  - Three individual servo positions can be programmed: lim2L, lim2C, lim2R
  - Example see vehicle CONFIG_HG_P407
+ 
+ New in V 3.2
+ - Added the "TXO_toggle1" variable: allows to toggle the TXO pin, using the "Back / Impulse" button on the transmitter
+ - Useful for example for additional lights
+ - Don't activate it in combination with "TXO_momentary1". Serial is not usable, if one of these booleans is set to true
 
 ## Usage
 

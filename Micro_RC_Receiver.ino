@@ -7,7 +7,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 3.1; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 3.2; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -243,7 +243,7 @@ void setup() {
   data.axis4 = 50;
 
   // Special functions
-  if (TXO_momentary1) pinMode(DIGITAL_OUT_1, OUTPUT);
+  if (TXO_momentary1 || TXO_toggle1) pinMode(DIGITAL_OUT_1, OUTPUT);
 
   // Motor driver setup
   setupMotors();
@@ -784,12 +784,24 @@ void mrsc() {
 //
 
 void digitalOutputs() {
-  if (TXO_momentary1) { // only, if function is enabled in vehicle configuration
+
+  static boolean wasPressed;
+
+  if (TXO_momentary1) { // only, if momentary function is enabled in vehicle configuration
     if (data.momentary1) {
       digitalWrite(DIGITAL_OUT_1, HIGH);
       R2D2_tell();
     }
     else digitalWrite(DIGITAL_OUT_1, LOW);
+  }
+
+  if (TXO_toggle1) { // only, if toggle function is enabled in vehicle configuration
+
+    if (data.momentary1  && !wasPressed) {
+      digitalWrite(DIGITAL_OUT_1, !digitalRead(DIGITAL_OUT_1));
+      wasPressed = true;
+    }
+    if (!data.momentary1) wasPressed = false;
   }
 }
 
