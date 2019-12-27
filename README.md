@@ -140,6 +140,11 @@ New in V 2.31
  - Added the "TXO_toggle1" variable: allows to toggle the TXO pin, using the "Back / Impulse" button on the transmitter
  - Useful for example for additional lights
  - Don't activate it in combination with "TXO_momentary1". Serial is not usable, if one of these booleans is set to true
+ 
+ New in V 3.3
+ - Added experimental support for serial communication with my "Arduino RC engine sound generator for ESP32": https://github.com/TheDIYGuy999/Rc_Engine_Sound_ESP32
+ - Uncomment "#define SERIAL_COMMUNICATION" in Adjustments.h of the sound generator
+ - Connect pin 36 "VP"of the sound generator  to pin "TXO" of the receiver (disable "TXO_momentary1" & "TXO_toggle1" in vehicleConfig.h)
 
 ## Usage
 

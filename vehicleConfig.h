@@ -4,7 +4,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_WPL_B-36 // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_SERIAL_TEST // <- Select the correct vehicle configuration here before uploading!
 
 //
 // =======================================================================================================
@@ -75,7 +75,7 @@
   boolean potentiometer1; // The potentiometer knob on the transmitter is linked to the servo output CH4
 
   // Engine sound (see: https://www.youtube.com/watch?v=pPlrx9yVI6E)
-  boolean engineSound; // true = a "TheDIYGuy999" engine simulator is wired to servo channel 3
+  boolean engineSound; // true = a "TheDIYGuy999" engine simulator is wired to servo channel 3 (allows to switch off RC signal, deprecated)
 
   // Tone sound (see: https://www.youtube.com/watch?v=fe5_1mMtcLQ&t=3s)
   boolean toneOut; // true = a BC337 amplifier for tone() is connected instead of servo 3
@@ -1781,6 +1781,66 @@ byte pwmPrescaler2 = 8; // 3936Hz
 boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = true;
 boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// Serial commands for ESP32 light and sound controller test (Tamiya Truck?) ---------------------------------------
+#ifdef CONFIG_SERIAL_TEST
+// Battery type
+boolean liPo = false; // LiPo is protected by ESC
+float cutoffVoltage = 4.0; // 5V supply
+
+// Board type
+float boardVersion = 1.5;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 9;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = true;
+boolean indicators = true;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 135, lim1R = 45; // Steering R 155, L 65
+byte lim2L = 45, lim2C = 90, lim2R = 135; // 3 speed gearbox shifting servo 71 = 3. gear, 106 2. gear, 146 = 1. gear.
+byte lim3L = 135, lim3R = 45; // ESC
+byte lim3Llow = 105, lim3Rlow = 75; // limited top speed ESC angles!
+byte lim4L = 45, lim4R = 135; // Controlled by pot, for sound triggering!
+#define THREE_SPEED_GEARBOX // Vehicle has a mechanical 3 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = false;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
