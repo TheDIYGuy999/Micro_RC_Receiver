@@ -144,7 +144,10 @@ New in V 2.31
  New in V 3.3
  - Added experimental support for serial communication with my "Arduino RC engine sound generator for ESP32": https://github.com/TheDIYGuy999/Rc_Engine_Sound_ESP32
  - Uncomment "#define SERIAL_COMMUNICATION" in Adjustments.h of the sound generator
- - Connect pin 36 "VP"of the sound generator  to pin "TXO" of the receiver (disable "TXO_momentary1" & "TXO_toggle1" in vehicleConfig.h)
+ - Connect pin 36 "VP"of the sound generator  to pin "TXO" of the receiver (disable "TXO_momentary1", "TXO_toggle1" & "headLights" in vehicleConfig.h)
+ 
+ New in V 3.31
+ - "headlLights" must be inactive as well in order to use serial communication!
 
 ## Usage
 

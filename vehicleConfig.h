@@ -1808,8 +1808,8 @@ byte vehicleType = 0;
 // Lights
 boolean escBrakeLights = false;
 boolean tailLights = false;
-boolean headLights = true;
-boolean indicators = true;
+boolean headLights = false;
+boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits

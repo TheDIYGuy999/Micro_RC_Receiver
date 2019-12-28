@@ -7,7 +7,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 3.3; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 3.31; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -214,8 +214,8 @@ void setup() {
 #endif
 
 #ifndef DEBUG
-  // If TXO pin is used for other things, disable Serial
-  if (TXO_momentary1 || TXO_toggle1) {
+  // If TXO pin or RXI pin is used for other things, disable Serial
+  if (TXO_momentary1 || TXO_toggle1 || headLights) {
     Serial.end(); // make sure, serial is off!
     UCSR0B = 0b00000000;
     serialCommands = false;
@@ -902,7 +902,7 @@ float batteryAverage() {
 
 //
 // =======================================================================================================
-// SERIAL COMMANDS TO LIGHT- & SOUND CONTROLLER (if not DEBUG, not TXO_momentary1, not TXO_toggle1)
+// SERIAL COMMANDS TO LIGHT- & SOUND CONTROLLER (if not DEBUG, not TXO_momentary1, not TXO_toggle1, not headLights)
 // =======================================================================================================
 //
 
