@@ -148,6 +148,9 @@ New in V 2.31
  
  New in V 3.31
  - "headlLights" must be inactive as well in order to use serial communication!
+ 
+ New in V 3.32
+ - "data.pot1" properly initialized (cauesd an issue on the ESP32 engine sound generator)
 
 ## Usage
 
