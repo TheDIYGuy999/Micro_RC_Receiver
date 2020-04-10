@@ -6281,12 +6281,13 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <pin name="MISO" x="-5.08" y="17.78" length="middle"/>
 <pin name="IRQ" x="-5.08" y="20.32" length="middle"/>
 <wire x1="0" y1="0" x2="0" y2="22.86" width="0.254" layer="94"/>
-<wire x1="0" y1="22.86" x2="12.7" y2="22.86" width="0.254" layer="94"/>
-<wire x1="12.7" y1="22.86" x2="12.7" y2="0" width="0.254" layer="94"/>
-<wire x1="12.7" y1="0" x2="0" y2="0" width="0.254" layer="94"/>
+<wire x1="0" y1="22.86" x2="17.78" y2="22.86" width="0.254" layer="94"/>
+<wire x1="17.78" y1="22.86" x2="17.78" y2="0" width="0.254" layer="94"/>
+<wire x1="17.78" y1="0" x2="0" y2="0" width="0.254" layer="94"/>
 <text x="0" y="23.622" size="1.778" layer="95">&gt;NAME</text>
 <text x="0" y="-2.54" size="1.778" layer="96">&gt;VALUE</text>
 <text x="10.16" y="5.08" size="1.778" layer="94" rot="R90">NRF24L01</text>
+<pin name="GND@1" x="22.86" y="2.54" length="middle" rot="R180"/>
 </symbol>
 <symbol name="CST">
 <wire x1="-5.08" y1="2.54" x2="5.08" y2="2.54" width="0.254" layer="94"/>
@@ -6396,6 +6397,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <connect gate="G$1" pin="CE" pad="3"/>
 <connect gate="G$1" pin="CSN" pad="4"/>
 <connect gate="G$1" pin="GND" pad="1"/>
+<connect gate="G$1" pin="GND@1" pad="9"/>
 <connect gate="G$1" pin="IRQ" pad="8"/>
 <connect gate="G$1" pin="MISO" pad="7"/>
 <connect gate="G$1" pin="MOSI" pad="6"/>
@@ -10966,20 +10968,22 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <part name="GND17" library="supply1" deviceset="GND" device=""/>
 <part name="C3" library="SparkFun-Capacitors" deviceset="10UF-16V-10%(TANT)" device="" value="10uF"/>
 <part name="GND18" library="supply1" deviceset="GND" device=""/>
+<part name="GND19" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
 <plain>
 <text x="157.48" y="83.82" size="1.778" layer="91">Motor 2</text>
 <text x="157.48" y="96.52" size="1.778" layer="91">Motor 1</text>
-<text x="193.04" y="116.84" size="1.778" layer="91">Dual Motor Driver</text>
+<text x="193.04" y="116.84" size="1.778" layer="91">Dual Motor Driver
+(optional)</text>
 <text x="20.32" y="241.3" size="1.778" layer="91">Battery connector</text>
 <text x="38.1" y="180.34" size="1.778" layer="91">3.3V supply</text>
 <text x="114.3" y="180.34" size="1.778" layer="91">2.4GHz Radio</text>
 <text x="335.28" y="246.38" size="1.778" layer="91">RC servo outputs</text>
 <text x="291.592" y="8.382" size="2.54" layer="91">2.4GHz Receiver with 4
 servo outputs and dual
-DC motor driver V1.4</text>
+DC motor driver V1.5</text>
 <text x="203.2" y="12.7" size="1.778" layer="91">Designed July 2016 - Feb. 2017
 by TheDIYGuy999</text>
 <text x="340.36" y="68.58" size="1.778" layer="91">Serial Header</text>
@@ -11038,6 +11042,7 @@ by TheDIYGuy999</text>
 <instance part="GND17" gate="1" x="45.72" y="55.88"/>
 <instance part="C3" gate="G$1" x="246.38" y="71.12"/>
 <instance part="GND18" gate="1" x="246.38" y="60.96"/>
+<instance part="GND19" gate="1" x="144.78" y="137.16"/>
 </instances>
 <busses>
 </busses>
@@ -11163,6 +11168,12 @@ by TheDIYGuy999</text>
 <pinref part="GND18" gate="1" pin="GND"/>
 <pinref part="C3" gate="G$1" pin="-"/>
 <wire x1="246.38" y1="63.5" x2="246.38" y2="66.04" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="G$1" pin="GND@1"/>
+<pinref part="GND19" gate="1" pin="GND"/>
+<wire x1="142.24" y1="154.94" x2="144.78" y2="154.94" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="154.94" x2="144.78" y2="139.7" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="VCC" class="0">

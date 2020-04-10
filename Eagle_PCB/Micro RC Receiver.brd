@@ -169,7 +169,7 @@
 <text x="25.4" y="0.238125" size="0.8128" layer="25" align="bottom-center">Sig.</text>
 <text x="32.7025" y="12.7" size="0.8128" layer="25" rot="R90" align="bottom-center">Sup.</text>
 <text x="15.24" y="0.396875" size="0.6096" layer="25" align="bottom-center">ICSP</text>
-<text x="20.32" y="1.27" size="0.8128" layer="22" rot="MR180" align="center">Micro RC Receiver V1.4</text>
+<text x="20.32" y="1.27" size="0.8128" layer="22" rot="MR180" align="center">Micro RC Receiver V1.5</text>
 <text x="18.25625" y="5.794375" size="0.6096" layer="25" rot="R90" align="bottom-center">SCL</text>
 <text x="23.65375" y="7.77875" size="0.6096" layer="25" rot="R90" align="bottom-center">SDA</text>
 </plain>
@@ -2014,6 +2014,7 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="13.335" y1="15.08125" x2="13.3375" y2="15.08125" width="0.4064" layer="1"/>
 <via x="4.048125" y="15.71625" extent="1-16" drill="0.6"/>
 <via x="12.303125" y="14.44625" extent="1-16" drill="0.6"/>
+<contactref element="IC1" pad="9"/>
 </signal>
 <signal name="VCC">
 <contactref element="U2" pad="6"/>
