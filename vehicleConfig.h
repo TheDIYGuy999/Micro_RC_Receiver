@@ -4,7 +4,9 @@
 
 #include "Arduino.h"
 
-#define CONFIG_SERIAL_TEST // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_KING_HAULER // <- Select the correct vehicle configuration here before uploading!
+
+#define SBUS_SERIAL // serial connection uses SBUS protocol instead of normal protocol, if not commented out
 
 //
 // =======================================================================================================
@@ -1010,6 +1012,66 @@ byte pwmPrescaler2 = 32;
 boolean TXO_momentary1 = true;
 boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// Tamiya King Hauler Truck with ESP32 Sound Controller in Serial mode (ESC controlled by ESP32) -----------------
+#ifdef CONFIG_KING_HAULER
+// Battery type
+boolean liPo = false; // LiPo is protected by ESC
+float cutoffVoltage = 4.0; // 5V supply
+
+// Board type
+float boardVersion = 1.5;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 5;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+byte lim1L = 135, lim1R = 58; // Steering R 135, L 58
+byte lim2L = 143, lim2C = 90, lim2R = 37; // 3 speed gearbox shifting servo (3., 2., 1. gear)
+byte lim3L = 135, lim3R = 45; // ESC
+byte lim3Llow = 135, lim3Rlow = 45; // limited top speed ESC angles! (full speed in this case)
+byte lim4L = 45, lim4R = 135; // Controlled by pot, for sound triggering!
+#define THREE_SPEED_GEARBOX // Vehicle has a mechanical 3 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = false;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
@@ -2549,11 +2611,11 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
-// MECCANO CAR 6 with JMT-10A ESC-------------------------------------------------------
+// MECCANO CAR 6 with Dumbo RC 10A ESC-------------------------------------------------------
 #ifdef CONFIG_MECCANO_CAR_6
 // Battery type
-boolean liPo = true; // Unprotected ESC!
-float cutoffVoltage = 4.5; // 2S LiPo, Receiver 5V supply from ESC
+boolean liPo = false; // Protected ESC!
+float cutoffVoltage = 3.5; // 2S LiPo, Receiver 5V supply from ESC
 
 // Board type
 float boardVersion = 1.4;
@@ -2575,8 +2637,10 @@ boolean beacons = false;
 // Servo limits
 byte lim1L = 45, lim1R = 135; // Steering reversed
 byte lim2L = 45, lim2R = 135;
-byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
-byte lim3Llow = 80, lim3Rlow = 110; 
+//byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
+//byte lim3Llow = 80, lim3Rlow = 110;
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 115, lim3Rlow = 70; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
