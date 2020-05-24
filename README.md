@@ -1,14 +1,20 @@
 # This is an ATMEL Mega328P / NRF24L01+ based 2.4GHz radio receiver
 ## Features:
+- Compatible with this transmitter: https://github.com/TheDIYGuy999/RC_Transmitter
 - Programmable with Arduino IDE
 - 4 RC servo connectors
-- integrated TB6612FNG dual dc motor driver
-- serial header (with SBUS support)
+- SBUS output
+- Outputs for Headlights, indicators, taillights with brake lights
+- Additional switching output
+- Support for self balancing robot or car with stability control (using an MPU-6050 sensor)
+- Integrated TB6612FNG dual dc motor driver
+- Serial header (with SBUS support)
 - I2C header (for example for the supported MPU-6050)
 - ICSP header for programming with Arduino IDE (use "TheDIYGuy999 328P" board definition and set brownout voltage to 1.8V)
 - NRF24L01+ SMD module integrated
 - very small size
-- Eagle files are also provided, if you want to build your own receiver!
+- Up to 10 vehicle addresses selectable, allows to use the same remote controller for 10 vehicles
+- Eagle & Gerber files are also provided, if you want to build your own receiver!
 
 See: https://www.youtube.com/playlist?list=PLGO5EJJClJBCjIvu8frS7LrEU3H2Yz_so
 
@@ -161,15 +167,23 @@ New in V 2.31
 ## Usage
 
 See pictures
+
+Newest version v1.5:
+![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/1.5complete.jpg)
+![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/1.5top.jpg)
+![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/1.5bottom.jpg)
+
+
+First prototype:
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/1.jpg)
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/2.jpg)
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/3.jpg)
 
-Receiver
+Receiver PCB
 
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/Micro_RC_Receiver.png)
 
-MPU-6050 shield
+MPU-6050 shield PCB
 
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/MPU-6050_Shield.png)
 
