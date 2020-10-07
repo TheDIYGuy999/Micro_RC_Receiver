@@ -8,7 +8,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 3.4; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 3.5; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -215,6 +215,16 @@ void setupMotors() {
 
 void setup() {
 
+  // All axes to neutral position
+  data.axis1 = 50;
+  data.axis2 = 50;
+  data.axis3 = 50;
+  data.axis4 = 50;
+  data.pot1 = 50; // Added in v3.32
+  data.mode1 = true;
+  data.mode2 = true;
+  data.momentary1 = false;
+
 #ifdef DEBUG
   Serial.begin(115200);
   printf_begin();
@@ -260,13 +270,6 @@ void setup() {
   if (!tailLights) servo2.attach(A1);
   if (!engineSound && !toneOut) servo3.attach(A2);
   if (!beacons) servo4.attach(A3);
-
-  // All axes to neutral position
-  data.axis1 = 50;
-  data.axis2 = 50;
-  data.axis3 = 50;
-  data.axis4 = 50;
-  data.pot1 = 50; // Added in v3.32
 
   // Special functions
   if (TXO_momentary1 || TXO_toggle1) pinMode(DIGITAL_OUT_1, OUTPUT);

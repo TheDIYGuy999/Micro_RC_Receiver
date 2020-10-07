@@ -163,6 +163,9 @@ New in V 2.31
  - Channel order and comments see sendSbusCommands()
  - You need to install my SBUS library: https://github.com/TheDIYGuy999/SBUS
  - Connect your servos or what ever to pin "TXO"  (disable "TXO_momentary1", "TXO_toggle1" & "headLights" in vehicleConfig.h)
+ 
+ New in V 3.5
+ - mode1, mode2 and momentary1 properly initialised before SBUS is enabled
 
 ## Usage
 
@@ -187,4 +190,4 @@ MPU-6050 shield PCB
 
 ![](https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/MPU-6050_Shield.png)
 
-(c) 2016 - 2019 TheDIYGuy999
+(c) 2016 - 2020 TheDIYGuy999
