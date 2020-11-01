@@ -8,7 +8,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 3.5; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 3.6; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -134,6 +134,10 @@ boolean serialCommands;
 SBUS x8r(Serial);
 #endif
 #endif
+
+// ESC variables for tracked and half tracked mode
+int lEsc;
+int rEsc;
 
 //
 // =======================================================================================================
@@ -464,11 +468,13 @@ void readRadio() {
 //
 
 void writeServos() {
+  // Servo 1 --------------------------------
   // Aileron or Steering
   if (vehicleType != 5) { // If not car with MSRC stabilty control
     servo1.write(map(data.axis1, 100, 0, lim1L, lim1R) ); // 45 - 135°
   }
 
+  // Servo 2 --------------------------------
   // Elevator or shifting gearbox actuator
 #ifdef TWO_SPEED_GEARBOX // Shifting gearbox mode, controlled by "Mode 1" button
   if (!tailLights) {
@@ -485,18 +491,40 @@ void writeServos() {
   }
 
 #else // Servo controlled by joystick CH2
-  if (!tailLights) servo2.write(map(data.axis2, 100, 0, lim2L, lim2R) ); // 45 - 135°
+  if (vehicleType != 1 && vehicleType != 2 && vehicleType != 6) {
+    if (!tailLights) servo2.write(map(data.axis2, 100, 0, lim2L, lim2R) ); // 45 - 135°
+  }
+  else { // Tracked or half tracked or differential thrust mode
+    servo2.write(map(lEsc, 100, 0, lim2L, lim2R) ); // 45 - 135°
+  }
 #endif
 #endif
 
+  // Servo 3 --------------------------------
   // Throttle (for ESC control, if you don't use the internal TB6612FNG motor driver)
-  if (data.mode1) { // limited speed!
-    servo3.write(map(data.axis3, 100, 0, lim3Llow, lim3Rlow ) ); // less than +/- 45°
+  if (vehicleType != 1 && vehicleType != 2 && vehicleType != 6) {
+    if (data.mode1) { // limited speed!
+      servo3.write(map(data.axis3, 100, 0, lim3Llow, lim3Rlow ) ); // less than +/- 45°
+    }
+    else { // full speed!
+      servo3.write(map(data.axis3, 100, 0, lim3L, lim3R) ); // 45 - 135°
+    }
   }
-  else { // full speed!
-    servo3.write(map(data.axis3, 100, 0, lim3L, lim3R) ); // 45 - 135°
+  else { // Tracked or half tracked or differential thrust mode
+    servo3.write(map(rEsc, 100, 0, lim3L, lim3R) ); // 45 - 135°
   }
 
+  // Axis 2 on the joystick switches engine sound on servo channel 3 on and off!
+  if (engineSound) {
+    if (data.axis2 > 80) {
+      servo3.attach(A2); // Enable servo 3 pulse
+    }
+    if (data. axis2 < 20) {
+      servo3.detach(); // Disable servo 3 pulse = engine off signal for "TheDIYGuy999" engine simulator!
+    }
+  }
+
+  // Servo 4 --------------------------------
   // Rudder or trailer unlock actuator
 #ifdef TRACTOR_TRAILER_UNLOCK // Tractor trailer unlocking, controlled by "Momentary 1" ("Back / Pulse") button
   if (!beacons && !potentiometer1) {
@@ -512,16 +540,6 @@ void writeServos() {
     if (!beacons) servo4.write(map(data.pot1, 0, 100, 45, 135) ); // 45 - 135°
   }
 #endif
-
-  // Axis 2 on the joystick switches engine sound on servo channel 3 on and off!
-  if (engineSound) {
-    if (data.axis2 > 80) {
-      servo3.attach(A2); // Enable servo 3 pulse
-    }
-    if (data. axis2 < 20) {
-      servo3.detach(); // Disable servo 3 pulse = engine off signal for "TheDIYGuy999" engine simulator!
-    }
-  }
 }
 
 //
@@ -625,8 +643,8 @@ void driveMotorsSteering() {
   int steeringFactorRight2;
 
   // The input signal range
-  const int servoMin = 0;
-  const int servoMax = 100;
+  const int servoMin = 5;
+  const int servoMax = 95;
   const int servoNeutralMin = 48;
   const int servoNeutralMax = 52;
 
@@ -678,6 +696,9 @@ void driveMotorsSteering() {
     pwm[0] = 0;
     pwm[1] = 0;
   }
+
+  lEsc = pwm[1]; // Output for dual ESC
+  rEsc = pwm[0];
 
   Motor1.drive(pwm[0], 0, 255, 0, false); // left caterpillar, 0ms ramp!
   Motor2.drive(pwm[1], 0, 255, 0, false); // right caterpillar
@@ -938,8 +959,14 @@ void sendSbusCommands() {
 
       // Proportional channels
       channels[0] = map(data.axis1, 0, 100, 172, 1811);
-      channels[1] = map(data.axis2, 0, 100, 172, 1811);
-      channels[2] = map(data.axis3, 0, 100, 172, 1811);
+      if (vehicleType != 1 && vehicleType != 2 && vehicleType != 6) { // Not tracked or half tracked or differential thrust mode
+        channels[1] = map(data.axis2, 0, 100, 172, 1811);
+        channels[2] = map(data.axis3, 0, 100, 172, 1811);
+      }
+      else { // tracked or half tracked or differential thrust mode
+        channels[1] = map(lEsc, 0, 100, 172, 1811);
+        channels[2] = map(rEsc, 0, 100, 172, 1811);
+      }
       channels[3] = map(data.axis4, 0, 100, 172, 1811);
       channels[4] = map(data.pot1, 0, 100, 172, 1811);
 

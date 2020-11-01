@@ -25,9 +25,9 @@ float curveSemi[][2] = {  // see excel sheet!
 // outer wheels RPM. That allows for turning the vehicle "on place"
 float curveFull[][2] = {
   {0, -100} // {input value, output value}
-  , {7, 0}
-  , {20, 45}
-  , {60, 85}
+  , {25, 9}
+  , {50, 61}
+  , {75, 87}
   , {100, 100}
 };
 

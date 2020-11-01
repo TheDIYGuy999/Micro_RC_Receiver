@@ -4,8 +4,9 @@
 
 #include "Arduino.h"
 
-#define CONFIG_ACTROS // <- Select the correct vehicle configuration here before uploading!
+#define CONFIG_WPL_B_36_MODE1 // <- Select the correct vehicle configuration here before uploading! CONFIG_WPL_B_36_MODE1  CONFIG_CATERPILLAR_TEST  CONFIG_KING_HAULER
 
+// NOTE: SBUS not usable if "TXO_momentary1" or "TXO_toggle1" or "headLights" or DEBUG!
 #define SBUS_SERIAL // serial connection uses SBUS protocol instead of normal protocol, if not commented out
 
 //
@@ -1851,8 +1852,8 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
-// 1:16 WPL B-36 Russian URAL-4320 Military Command Truck (old configuration)-------------------------------------------------
-#ifdef CONFIG_WPL_B_36_OLD
+// 1:16 WPL B-36 Russian URAL-4320 Military Command Truck (Gearbox switched with mode 1)------------------------------
+#ifdef CONFIG_WPL_B_36_MODE1
 // Battery type
 boolean liPo = false;
 float cutoffVoltage = 0.0; // 6V receiver supply voltage, but Sound module causes a lot of noise!
@@ -1870,8 +1871,8 @@ byte vehicleType = 0;
 // Lights
 boolean escBrakeLights = false;
 boolean tailLights = false;
-boolean headLights = true;
-boolean indicators = true;
+boolean headLights = false;
+boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
@@ -1901,7 +1902,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
 boolean TXO_momentary1 = false;
-boolean TXO_toggle1 = true;
+boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
 // Engine sound
@@ -1911,7 +1912,7 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
-// 1:16 WPL B-36 Russian URAL-4320 Military Command Truck-------------------------------------------------
+// 1:16 WPL B-36 Russian URAL-4320 Military Command Truck (Gearbox switched with 3 pos switch)--------------------------
 #ifdef CONFIG_WPL_B_36
 // Battery type
 boolean liPo = false;
@@ -2272,7 +2273,7 @@ boolean liPo = false;
 float cutoffVoltage = 3.1;
 
 // Board type
-float boardVersion = 1.0;
+float boardVersion = 1.3;
 boolean HP = false;
 
 // Vehicle address
@@ -2284,8 +2285,8 @@ byte vehicleType = 2; // 2 = caterpillar mode
 // Lights
 boolean escBrakeLights = false;
 boolean tailLights = false;
-boolean headLights = true;
-boolean indicators = true;
+boolean headLights = false;
+boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
@@ -2312,7 +2313,7 @@ byte steeringTorque = 255;
 byte pwmPrescaler2 = 32;
 
 // Additional Channels
-boolean TXO_momentary1 = true;
+boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 

@@ -166,6 +166,10 @@ New in V 2.31
  
  New in V 3.5
  - mode1, mode2 and momentary1 properly initialised before SBUS is enabled
+ 
+ New in V 3.6
+ - "vehicleType" 1 or 2 (tracked or half tracked mode steering mixer) is now working as well, if two ESC are connected to servo pins 2 and 3. In the past, it was only usable with the internal TB6612 dual DC motor driver.
+ - Also works in combination with my ESP32 Engine Sound & Light Controller (SBUS & PWM Mode)
 
 ## Usage
 
