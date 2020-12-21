@@ -170,6 +170,9 @@ New in V 2.31
  New in V 3.6
  - "vehicleType" 1 or 2 (tracked or half tracked mode steering mixer) is now working as well, if two ESC are connected to servo pins 2 and 3. In the past, it was only usable with the internal TB6612 dual DC motor driver.
  - Also works in combination with my ESP32 Engine Sound & Light Controller (SBUS & PWM Mode)
+ 
+ New in V 3.7
+ - Steering center position separately adjustable, using "#define STEERING_3_POINT_CAL" and "lim1C". This is useful for badly designed steering linkage geometries. Example see vehicle configuration "CONFIG_WPL_B_36_MODE1"
 
 ## Usage
 

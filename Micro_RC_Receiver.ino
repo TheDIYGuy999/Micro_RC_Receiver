@@ -8,7 +8,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 3.6; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 3.7; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -471,7 +471,13 @@ void writeServos() {
   // Servo 1 --------------------------------
   // Aileron or Steering
   if (vehicleType != 5) { // If not car with MSRC stabilty control
+#ifndef STEERING_3_POINT_CAL    
     servo1.write(map(data.axis1, 100, 0, lim1L, lim1R) ); // 45 - 135°
+#else
+    if (data.axis1 < 50) servo1.write(map(data.axis1, 50, 0, lim1C, lim1R) );
+    else if (data.axis1 > 50) servo1.write(map(data.axis1, 100, 50, lim1L, lim1C) );
+    else servo1.write (lim1C);
+#endif    
   }
 
   // Servo 2 --------------------------------
