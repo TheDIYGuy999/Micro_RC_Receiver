@@ -13,7 +13,7 @@
 - ICSP header for programming with Arduino IDE (use "TheDIYGuy999 328P" board definition and set brownout voltage to 1.8V)
 - NRF24L01+ SMD module integrated
 - very small size
-- Up to 10 vehicle addresses selectable, allows to use the same remote controller for 10 vehicles
+- Up to 20 vehicle addresses selectable, allows to use the same remote controller for 10 vehicles
 - Eagle & Gerber files are also provided, if you want to build your own receiver!
 
 See: https://www.youtube.com/playlist?list=PLGO5EJJClJBCjIvu8frS7LrEU3H2Yz_so
@@ -173,6 +173,11 @@ New in V 2.31
  
  New in V 3.7
  - Steering center position separately adjustable, using "#define STEERING_3_POINT_CAL" and "lim1C". This is useful for badly designed steering linkage geometries. Example see vehicle configuration "CONFIG_WPL_B_36_MODE1"
+ 
+ New in V 3.8:
+ - 20 vehicle addresses instead of 10
+ - Less RAM usage
+ - 2 speed transmission not shifting while standing still. This will protect the shifting servo.
 
 ## Usage
 

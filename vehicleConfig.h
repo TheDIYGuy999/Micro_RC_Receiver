@@ -4,7 +4,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_WPL_B_36_MODE1 // <- Select the correct vehicle configuration here before uploading! CONFIG_WPL_B_36_MODE1  CONFIG_CATERPILLAR_TEST  CONFIG_KING_HAULER
+#define CONFIG_WPL_C44 // <- Select the correct vehicle configuration here before uploading! CONFIG_WPL_B_36_MODE1  CONFIG_CATERPILLAR_TEST  CONFIG_KING_HAULER
 
 // NOTE: SBUS not usable if "TXO_momentary1" or "TXO_toggle1" or "headLights" or DEBUG!
 #define SBUS_SERIAL // serial connection uses SBUS protocol instead of normal protocol, if not commented out
@@ -1879,7 +1879,7 @@ boolean beacons = false;
 // Servo limits
 #define STEERING_3_POINT_CAL // steering center point is separately adjustable
 byte lim1L = 62, lim1C = 107, lim1R = 140; // R62 C106 L140
-byte lim2L = 38, lim2R = 116; // Gearbox shifter limits (1. and 2. gear, 38, 116)
+byte lim2L = 15, lim2R = 121; // Gearbox shifter limits (1. and 2. gear, 42, 123)
 byte lim3L = 150, lim3R = 35; // ESC output signal reversed
 byte lim3Llow = 150, lim3Rlow = 35; // 2 speed transmission, so same values!
 byte lim4L = 45, lim4R = 135;
@@ -2432,6 +2432,67 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// 1:14 WPL C44KM Toyota (Gearbox switched with mode 1)------------------------------
+#ifdef CONFIG_WPL_C44
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 0.0; // 6V receiver supply voltage, but Sound module causes a lot of noise!
+
+// Board type
+float boardVersion = 1.2;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 20;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits
+#define STEERING_3_POINT_CAL // steering center point is separately adjustable
+byte lim1L = 56, lim1C = 92, lim1R = 120; // R56 C91 L120
+byte lim2L = 15, lim2R = 104; // Gearbox shifter limits (1. and 2. gear, 41, 123)
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 150, lim3Rlow = 35; // 2 speed transmission, so same values!
+byte lim4L = 45, lim4R = 135;
+#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 

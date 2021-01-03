@@ -8,7 +8,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 3.7; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 3.8; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -42,6 +42,7 @@ const float codeVersion = 3.7; // Software revision (see https://github.com/TheD
 #include "tone.h"
 #include "balancing.h"
 #include "helper.h"
+#include "pgmRead64.h" // Read 64 bit blocks from PROGMEM
 
 //
 // =======================================================================================================
@@ -56,10 +57,12 @@ const byte NRFchannel[] {
 };
 
 // the ID number of the used "radio pipe" must match with the selected ID on the transmitter!
-// 10 ID's are available @ the moment
-const uint64_t pipeIn[] = {
+// 20 ID's are available @ the moment
+const uint64_t pipeIn[] PROGMEM = {
   0xE9E8F0F0B1LL, 0xE9E8F0F0B2LL, 0xE9E8F0F0B3LL, 0xE9E8F0F0B4LL, 0xE9E8F0F0B5LL,
-  0xE9E8F0F0B6LL, 0xE9E8F0F0B7LL, 0xE9E8F0F0B8LL, 0xE9E8F0F0B9LL, 0xE9E8F0F0B0LL
+  0xE9E8F0F0B6LL, 0xE9E8F0F0B7LL, 0xE9E8F0F0B8LL, 0xE9E8F0F0B9LL, 0xE9E8F0F0B0LL,
+  0xE9E8F0F0C1LL, 0xE9E8F0F0C2LL, 0xE9E8F0F0C3LL, 0xE9E8F0F0C4LL, 0xE9E8F0F0C5LL,
+  0xE9E8F0F0C6LL, 0xE9E8F0F0C7LL, 0xE9E8F0F0C8LL, 0xE9E8F0F0C9LL, 0xE9E8F0F0C0LL
 };
 const int maxVehicleNumber = (sizeof(pipeIn) / (sizeof(uint64_t)));
 
@@ -153,7 +156,8 @@ void setupRadio() {
   radio.setPALevel(RF24_PA_HIGH); // HIGH
 
   radio.setDataRate(RF24_250KBPS);
-  radio.setAutoAck(pipeIn[vehicleNumber - 1], true); // Ensure autoACK is enabled
+  //radio.setAutoAck(pipeIn[vehicleNumber - 1], true); // Ensure autoACK is enabled
+  radio.setAutoAck(pgm_read_64(&pipeIn, vehicleNumber - 1), true); // Ensure autoACK is enabled
   radio.enableAckPayload();
   radio.enableDynamicPayloads();
   radio.setRetries(5, 5);                  // 5x250us delay (blocking!!), max. 5 retries
@@ -164,7 +168,8 @@ void setupRadio() {
   delay(3000);
 #endif
 
-  radio.openReadingPipe(1, pipeIn[vehicleNumber - 1]);
+  //radio.openReadingPipe(1, pipeIn[vehicleNumber - 1]);
+  radio.openReadingPipe(1, pgm_read_64(&pipeIn, vehicleNumber - 1));
   radio.startListening();
 }
 
@@ -471,21 +476,23 @@ void writeServos() {
   // Servo 1 --------------------------------
   // Aileron or Steering
   if (vehicleType != 5) { // If not car with MSRC stabilty control
-#ifndef STEERING_3_POINT_CAL    
+#ifndef STEERING_3_POINT_CAL
     servo1.write(map(data.axis1, 100, 0, lim1L, lim1R) ); // 45 - 135°
 #else
     if (data.axis1 < 50) servo1.write(map(data.axis1, 50, 0, lim1C, lim1R) );
     else if (data.axis1 > 50) servo1.write(map(data.axis1, 100, 50, lim1L, lim1C) );
     else servo1.write (lim1C);
-#endif    
+#endif
   }
 
   // Servo 2 --------------------------------
   // Elevator or shifting gearbox actuator
 #ifdef TWO_SPEED_GEARBOX // Shifting gearbox mode, controlled by "Mode 1" button
-  if (!tailLights) {
-    if (data.mode1)servo2.write(lim2L);
-    else servo2.write(lim2R);
+  if (!tailLights ) {
+    if (data.axis3 < 45 || data.axis3 > 55) { // Don't change gear while WPL transmission is standing still!
+      if (data.mode1)servo2.write(lim2L);
+      else servo2.write(lim2R);
+    }
   }
 
 #else
