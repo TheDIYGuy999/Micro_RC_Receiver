@@ -179,6 +179,9 @@ New in V 2.31
  - Less RAM usage
  - 2 speed transmission not shifting while standing still. This will protect the shifting servo.
 
+New in V 3.81:
+ - Libraries comments added
+
 ## Usage
 
 See pictures

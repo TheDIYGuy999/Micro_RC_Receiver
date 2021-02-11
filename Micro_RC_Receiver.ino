@@ -8,7 +8,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 3.8; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 3.81; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -26,7 +26,7 @@ const float codeVersion = 3.8; // Software revision (see https://github.com/TheD
 
 // Libraries
 #include <Wire.h> // I2C library (for the MPU-6050 gyro /accelerometer)
-#include <RF24.h> // Installed via Tools > Board > Boards Manager > Type RF24
+#include <RF24.h> // Installed via Sketch > Include Library > Manage Libraries > Type "RF24" (use V1.3.3!)
 #include <printf.h>
 #include <Servo.h>
 #include <statusLED.h> // https://github.com/TheDIYGuy999/statusLED
