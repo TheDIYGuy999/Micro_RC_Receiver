@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2021-04-02T07:34:21Z",
+        "GenerationSoftware": {
+            "Application": "EAGLE",
+            "Vendor": "Autodesk",
+            "Version": "9.6.1"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.5723,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "Nano RC Receiver"
+        },
+        "Owner": "Martin Sommer <msommer74@gmail.com>",
+        "Size": {
+            "X": 19.812,
+            "Y": 13.97
+        }
+    }
+}

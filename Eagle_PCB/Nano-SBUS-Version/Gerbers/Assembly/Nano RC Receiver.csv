@@ -1,0 +1,14 @@
+"Qty";"Value";"Device";"Package";"Parts";"Description";"POPULARITY";"PROD_ID";"SPICEPREFIX";"VALUE";
+"1";"";"ATMEGA328P_MLFMLF32";"MLF32-PAD";"U2";"Datasheet";"";"";"";"";
+"1";"";"NRF24L01SMD_PAD";"NRF24L01_SMD_PAD";"IC1";"2.4GHz Radio Module";"";"";"";"";
+"2";"";"PINHD-1X31.27";"1X03_1.27";"JP3, JP6";"PIN HEADER";"";"";"";"";
+"1";"";"PINHD-1X3SMT";"1X03_SMT";"JP1";"PIN HEADER";"";"";"";"";
+"1";"";"PINHD-1X41.27";"1X04_1.27";"JP4";"PIN HEADER";"";"";"";"";
+"1";"";"PINHD-1X51.27";"1X05_1.27";"JP7";"PIN HEADER";"";"";"";"";
+"1";"";"PINHD-1X61.27";"1X06_1.27";"JP5";"PIN HEADER";"";"";"";"";
+"2";"100nF 50V";"C-EUC0603";"C0603";"C2, C4";"CAPACITOR, European symbol";"73";"";"C";"";
+"2";"10k";"R-EU_R0603";"R0603";"R1, R3";"RESISTOR, European symbol";"70";"";"R";"";
+"1";"10uF";"10UF-16V-10%(TANT)";"EIA3216";"C1";"CAP-00811";"";"CAP-00811";"";"10uF";
+"1";"20k";"R-EU_R0603";"R0603";"R2";"RESISTOR, European symbol";"70";"";"R";"";
+"1";"CSTNE8M00G550000R0";"RESONATORSMD-3.2X1.3";"RESONATOR-SMD-3.2X1.3";"Y2";"Resonators (Generic)";"";"";"";"";
+"1";"MIC5205-3.3";"MIC52053.3V";"SOT23-5";"U1";"MIC5205 150mA vreg";"";"VREG-00822";"";"";
