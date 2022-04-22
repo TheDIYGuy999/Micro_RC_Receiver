@@ -4,7 +4,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_WPL_C44 // <- Select the correct vehicle configuration here before uploading! CONFIG_WPL_B_36_MODE1  CONFIG_CATERPILLAR_TEST  CONFIG_KING_HAULER
+#define CONFIG_MECCANO_DUMPER // <- Select the correct vehicle configuration here before uploading! CONFIG_WPL_B_36_MODE1  CONFIG_CATERPILLAR_TEST  CONFIG_KING_HAULER
 
 // NOTE: SBUS not usable if "TXO_momentary1" or "TXO_toggle1" or "headLights" or DEBUG!
 #define SBUS_SERIAL // serial connection uses SBUS protocol instead of normal protocol, if not commented out
@@ -32,6 +32,7 @@
   0 = car (see: https://www.youtube.com/watch?v=A0SoK7KJxyc). Use this mode, if you want to use indicators. No MPU-6050 MRSC support.
   1 = semi caterpillar, 2 = caterpillar (see: https://www.youtube.com/watch?v=Tjikm6hJ8hQ)
   3 = forklift (see: https://www.youtube.com/watch?v=3iXL9WvE4ro)
+  #define VEHICLE_TYPE_3_WITH_ESC = forklift or dumper with separate ESC, motor driver 1 is controlled by CH 4
   4 = balancing (see: https://www.youtube.com/watch?v=zse9-l2Yo3Y)
   5 = car with MRSC (Micro RC Stability Control). Similar with ABS, ESP, Traxxas Stability Management TSM. Potentiometer on A6 input of
   your transmitter required! (see: https://www.youtube.com/watch?v=IPve7QpdLBc&t=5s) Indicators can't be used in this mode (locked)!
@@ -626,13 +627,14 @@ byte vehicleType = 0;
 // Lights
 boolean escBrakeLights = false;
 boolean tailLights = false;
-boolean headLights = true;
-boolean indicators = true;
+boolean headLights = false;
+boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 155, lim1R = 65; // Steering R 155, L 65
-byte lim2L = 71, lim2C = 106, lim2R = 146; // 3 speed gearbox shifting servo 71 = 3. gear, 106 2. gear, 146 = 1. gear.
+#define STEERING_3_POINT_CAL // steering center point is separately adjustable
+byte lim1L = 62, lim1C = 100, lim1R = 134; // R60 C96 L132
+byte lim2L = 67, lim2C = 99, lim2R = 146; // 3 speed gearbox shifting servo 69 = 3. gear, 99 2. gear, 146 = 1. gear.
 byte lim3L = 135, lim3R = 45;
 byte lim3Llow = 105, lim3Rlow = 75; // limited top speed angles!
 byte lim4L = 45, lim4R = 135;
@@ -656,7 +658,7 @@ byte steeringTorque = 255;
 byte pwmPrescaler2 = 8; // 3936Hz
 
 // Additional Channels
-boolean TXO_momentary1 = true;
+boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
@@ -1233,7 +1235,8 @@ boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 130, lim1R = 50; // Steering L 130, R 50
+#define STEERING_3_POINT_CAL // steering center point is separately adjustable
+byte lim1L = 130, lim1C = 90, lim1R = 50; // Steering L 130, C 90, R 50
 byte lim2L = 143, lim2C = 90, lim2R = 37; // 3 speed gearbox shifting servo (3., 2., 1. gear)
 byte lim3L = 135, lim3R = 45; // ESC
 byte lim3Llow = 135, lim3Rlow = 45; // limited top speed ESC angles! (full speed in this case)
@@ -2442,6 +2445,67 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
+// 1:10 RGT EX86100 Jeep Wrangler with ESP32 sound controller  (everything is controlled via SBUS)------------------------------
+#ifdef CONFIG_RGT_EX86100
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 0.0; // 6V receiver supply voltage, but ESC is handling cutoff
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 19;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits (not used, servos controlled via SBUS)
+#define STEERING_3_POINT_CAL // steering center point is separately adjustable
+byte lim1L = 56, lim1C = 92, lim1R = 120; // R56 C91 L120
+byte lim2L = 15, lim2R = 104; // Gearbox shifter limits (1. and 2. gear, 41, 123)
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 150, lim3Rlow = 35; // 2 speed transmission, so same values!
+byte lim4L = 45, lim4R = 135;
+#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = false;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
 // 1:14 WPL C44KM Toyota (Gearbox switched with mode 1)------------------------------
 #ifdef CONFIG_WPL_C44
 // Battery type
@@ -2916,8 +2980,8 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
-// Meccano vehicle with ESP32 Sound Controller in SBUS mode (ESC controlled by ESP32) -----------------
-#ifdef CONFIG_MECCANO_CAR_8
+// Meccano dumper with ESP32 Sound Controller in SBUS mode (ESC controlled by ESP32) -----------------
+#ifdef CONFIG_MECCANO_DUMPER
 // Battery type
 boolean liPo = false; // LiPo is protected by ESC
 float cutoffVoltage = 4.0; // 5V supply
@@ -2930,7 +2994,8 @@ boolean HP = false;
 int vehicleNumber = 8;
 
 // Vehicle type
-byte vehicleType = 0;
+byte vehicleType = 3; // Forklift mode also used for dumper!
+#define VEHICLE_TYPE_3_WITH_ESC // Vehicle with ESC, motor driver 1 is used for other stuff
 
 // Lights
 boolean escBrakeLights = false;
@@ -2940,13 +3005,11 @@ boolean indicators = false;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 45, lim1R = 135; // Steering R 142, L 57
-byte lim2L = 143, lim2C = 90, lim2R = 37; // 3 speed gearbox shifting servo (3., 2., 1. gear)
-byte lim3L = 135, lim3R = 45; // ESC
-byte lim3Llow = 135, lim3Rlow = 45; // limited top speed ESC angles! (full speed in this case)
-byte lim4L = 45, lim4R = 135; // Controlled by pot, for sound triggering!
-#define THREE_SPEED_GEARBOX // Vehicle has a mechanical 3 speed shifting gearbox, switched by servo CH2.
-// Not usable in combination with the "tailLights" option
+byte lim1L = 135, lim1R = 45;
+byte lim2L = 45, lim2R = 135;
+byte lim3L = 45, lim3R = 135;
+byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
+byte lim4L = 45, lim4R = 135;
 
 // Motor configuration
 int maxPWMfull = 255;
@@ -2959,7 +3022,7 @@ byte maxAccelerationLimited = 12;
 float tiltCalibration = 0.0;
 
 // Steering configuration
-byte steeringTorque = 255;
+byte steeringTorque = 255; // Full power for motor driver
 
 // Motor 2 PWM frequency
 byte pwmPrescaler2 = 8; // 3936Hz
@@ -2967,7 +3030,7 @@ byte pwmPrescaler2 = 8; // 3936Hz
 // Additional Channels
 boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
+boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;

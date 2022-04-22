@@ -181,6 +181,10 @@ New in V 2.31
 
 New in V 3.81:
  - Libraries comments added
+ 
+ New in V 3.9:
+ - New "#define VEHICLE_TYPE_3_WITH_ESC" option for vehicle type 3. Allows to use both TB6612 FNG motor driver channels for other stuff
+ - Used in "CONFIG_MECCANO_DUMPER"
 
 ## Usage
 

@@ -8,7 +8,7 @@
 
 // * * * * N O T E ! The vehicle specific configurations are stored in "vehicleConfig.h" * * * *
 
-const float codeVersion = 3.81; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
+const float codeVersion = 3.9; // Software revision (see https://github.com/TheDIYGuy999/Micro_RC_Receiver/blob/master/README.md)
 
 //
 // =======================================================================================================
@@ -632,10 +632,14 @@ void driveMotorsForklift() {
   // SYNTAX: Input value, max PWM, ramptime in ms per 1 PWM increment
   // false = brake in neutral position inactive
 
-
+#if not defined VEHICLE_TYPE_3_WITH_ESC // Motor driver 1 used for driving motor, no ESC
   if (Motor1.drive(data.axis3, minPWM, maxPWM, maxAcceleration, true) ) { // The drive motor (function returns true, if not in neutral)
     millisLightOff = millis(); // Reset the headlight delay timer, if the vehicle is driving!
   }
+#else // Motor driver 1 can be used for other stuff, if vehicle has dedicated ESC
+  Motor1.drive(data.axis4, 0, steeringTorque, 0, false); // additional motor
+#endif  
+  
   Motor2.drive(data.axis2, 0, steeringTorque, 0, false); // The fork lifting motor (the steering is driven by servo 1)
 }
 
@@ -960,7 +964,7 @@ float batteryAverage() {
 void sendSbusCommands() {
 
   static unsigned long lastSbusTime;
-  uint16_t channels[16];
+  uint16_t channels[16]; // 0 - 15
 
   // See: https://github.com/TheDIYGuy999/Rc_Engine_Sound_ESP32
 
@@ -990,6 +994,13 @@ void sendSbusCommands() {
       if (hazard) channels[8] = 1811; else channels[8] = 172;
       if (left) channels[9] = 1811; else channels[9] = 172;
       if (right) channels[10] = 1811; else channels[10] = 172;
+
+      // Empty channels in neutral position
+      channels[11] = 991;
+      channels[12] = 991;
+      channels[13] = 991;
+      channels[14] = 991;
+      channels[15] = 991;
 
       // write the SBUS packet
 #ifdef SBUS_SERIAL
