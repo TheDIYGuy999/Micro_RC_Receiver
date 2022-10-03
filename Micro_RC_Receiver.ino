@@ -513,8 +513,24 @@ void writeServos() {
 #endif
 #endif
 
-  // Servo 3 --------------------------------
+  // Servo 3 (ESC) --------------------------------
   // Throttle (for ESC control, if you don't use the internal TB6612FNG motor driver)
+
+#if defined ESC_MICROSECONDS
+  uint16_t servo3Microseconds = 1500;
+  static uint16_t servo3Microseconds2 = 1500;
+  static long previousThrottleRampMillis;
+
+  if (millis() - previousThrottleRampMillis >= 1) {
+    previousThrottleRampMillis = millis();
+    servo3Microseconds = map(data.axis3, 100, 0, 2000, 1000);
+    servo3Microseconds = reMap(curveExponentialThrottle, servo3Microseconds);
+    if (servo3Microseconds2 < servo3Microseconds) servo3Microseconds2 ++;
+    if (servo3Microseconds2 > servo3Microseconds) servo3Microseconds2 --;
+    servo3.writeMicroseconds(servo3Microseconds2);
+  }
+#else
+
   if (vehicleType != 1 && vehicleType != 2 && vehicleType != 6) {
     if (data.mode1) { // limited speed!
       servo3.write(map(data.axis3, 100, 0, lim3Llow, lim3Rlow ) ); // less than +/- 45°
@@ -526,6 +542,7 @@ void writeServos() {
   else { // Tracked or half tracked or differential thrust mode
     servo3.write(map(rEsc, 100, 0, lim3L, lim3R) ); // 45 - 135°
   }
+#endif
 
   // Axis 2 on the joystick switches engine sound on servo channel 3 on and off!
   if (engineSound) {
@@ -638,8 +655,8 @@ void driveMotorsForklift() {
   }
 #else // Motor driver 1 can be used for other stuff, if vehicle has dedicated ESC
   Motor1.drive(data.axis4, 0, steeringTorque, 0, false); // additional motor
-#endif  
-  
+#endif
+
   Motor2.drive(data.axis2, 0, steeringTorque, 0, false); // The fork lifting motor (the steering is driven by servo 1)
 }
 

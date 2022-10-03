@@ -4,10 +4,12 @@
 
 #include "Arduino.h"
 
-#define CONFIG_MECCANO_DUMPER // <- Select the correct vehicle configuration here before uploading! CONFIG_WPL_B_36_MODE1  CONFIG_CATERPILLAR_TEST  CONFIG_KING_HAULER
+#define CONFIG_BRUSHLESS_D90 // <- Select the correct vehicle configuration here before uploading! CONFIG_WPL_B_36_MODE1  CONFIG_CATERPILLAR_TEST  CONFIG_KING_HAULER
 
 // NOTE: SBUS not usable if "TXO_momentary1" or "TXO_toggle1" or "headLights" or DEBUG!
 #define SBUS_SERIAL // serial connection uses SBUS protocol instead of normal protocol, if not commented out
+
+#define ESC_MICROSECONDS // ESC controlled in microseconds instead of degrees (experimental)
 
 //
 // =======================================================================================================
@@ -1469,7 +1471,8 @@ boolean indicators = true;
 boolean beacons = false;
 
 // Servo limits
-byte lim1L = 75, lim1R = 130; // R65  L120
+#define STEERING_3_POINT_CAL // steering center point is separately adjustable
+byte lim1L = 55, lim1C = 95, lim1R = 130; // R55 C95 L130
 byte lim2L = 10, lim2R = 120; // Gearbox shifter limits (1. and 2. gear)
 byte lim3L = 150, lim3R = 35; // ESC output signal reversed
 byte lim3Llow = 150, lim3Rlow = 35; // same setting (full throttle), because of shifting gearbox!
@@ -1504,65 +1507,6 @@ boolean engineSound = false;
 // Tone sound
 boolean toneOut = false;
 #endif
-
-// Receiver board scratch build tutorial----------------------------------------------------------------
-#ifdef CONFIG_SCRATCH_TUTORIAL
-// Battery type
-boolean liPo = false;
-float cutoffVoltage = 4.4;
-
-// Board type
-float boardVersion = 1.3;
-boolean HP = true; // High Power Board!
-
-// Vehicle address
-int vehicleNumber = 8;
-
-// Vehicle type
-byte vehicleType = 0;
-
-// Lights
-boolean escBrakeLights = false;
-boolean tailLights = false;
-boolean headLights = false;
-boolean indicators = false;
-boolean beacons = false;
-
-// Servo limits
-byte lim1L = 35, lim1R = 132;
-byte lim2L = 45, lim2R = 135;
-byte lim3L = 45, lim3R = 135;
-byte lim3Llow = 75, lim3Rlow = 105; // limited top speed angles!
-byte lim4L = 45, lim4R = 135;
-
-// Motor configuration
-int maxPWMfull = 255;
-int maxPWMlimited = 170;
-int minPWM = 5;
-byte maxAccelerationFull = 12;
-byte maxAccelerationLimited = 15;
-
-// Variables for self balancing (vehicleType = 4) only!
-float tiltCalibration = 0.0;
-
-// Steering configuration
-byte steeringTorque = 255;
-
-// Motor 2 PWM frequency
-byte pwmPrescaler2 = 8; // 3936Hz
-
-// Additional Channels
-boolean TXO_momentary1 = true;
-boolean TXO_toggle1 = false;
-boolean potentiometer1 = false;
-
-// Engine sound
-boolean engineSound = false;
-
-// Tone sound
-boolean toneOut = false;
-#endif
-
 
 // Maisto Chevy Camaro SS---------------------------------------------------------------------------
 #ifdef CONFIG_CAMARO
@@ -1680,66 +1624,6 @@ boolean engineSound = false;
 boolean toneOut = false;
 #endif
 
-// 1:12 MN Model Landrover Defender D90-------------------------------------------------
-#ifdef CONFIG_DEFENDER90
-// Battery type
-boolean liPo = true;
-float cutoffVoltage = 4.5; // 5V receiver supply voltage surveillance from BEC only!
-
-// Board type
-float boardVersion = 1.4;
-boolean HP = false;
-
-// Vehicle address
-int vehicleNumber = 8;
-
-// Vehicle type
-byte vehicleType = 0;
-
-// Lights
-boolean escBrakeLights = true;
-boolean tailLights = false;
-boolean headLights = true;
-boolean indicators = true;
-boolean beacons = false;
-
-// Servo limits
-byte lim1L = 55, lim1R = 125; // R50  L130
-byte lim2L = 43, lim2R = 120; // Gearbox shifter limits (1. and 2. gear)
-byte lim3L = 65, lim3R = 125; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
-byte lim3Llow = 65, lim3Rlow = 125; // same setting (full throttle), because of shifting gearbox!
-byte lim4L = 45, lim4R = 135;
-#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
-// Not usable in combination with the "tailLights" option
-
-// Motor configuration
-int maxPWMfull = 255;
-int maxPWMlimited = 170;
-int minPWM = 0;
-byte maxAccelerationFull = 7;
-byte maxAccelerationLimited = 12;
-
-// Variables for self balancing (vehicleType = 4) only!
-float tiltCalibration = 0.0;
-
-// Steering configuration
-byte steeringTorque = 255;
-
-// Motor 2 PWM frequency
-byte pwmPrescaler2 = 8; // 3936Hz
-
-// Additional Channels
-boolean TXO_momentary1 = true;
-boolean TXO_toggle1 = false;
-boolean potentiometer1 = false;
-
-// Engine sound
-boolean engineSound = false;
-
-// Tone sound
-boolean toneOut = false;
-#endif
-
 // Remo Hobby S Max---------------------------------------------------------------------------
 #ifdef CONFIG_S_MAX
 // Battery type
@@ -1790,64 +1674,6 @@ byte pwmPrescaler2 = 8; // 3936Hz
 boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = true;
 boolean potentiometer1 = true;
-
-// Engine sound
-boolean engineSound = false;
-
-// Tone sound
-boolean toneOut = false;
-#endif
-
-// 1:18 LaFerrari-------------------------------------------------------------------------
-#ifdef CONFIG_LAFERRARI
-// Battery type
-boolean liPo = true;
-float cutoffVoltage = 4.9; // 5V receiver supply voltage surveillance from BEC only!
-
-// Board type
-float boardVersion = 1.2;
-boolean HP = false;
-
-// Vehicle address
-int vehicleNumber = 9;
-
-// Vehicle type
-byte vehicleType = 0;
-
-// Lights
-boolean escBrakeLights = false;
-boolean tailLights = false;
-boolean headLights = true;
-boolean indicators = true;
-boolean beacons = false;
-
-// Servo limits
-byte lim1L = 50, lim1R = 140; // R50  L140
-byte lim2L = 45, lim2R = 135;
-byte lim3L = 65, lim3R = 120; // +/-25° is still full throttle with the JMT-10A ESC! (Forward, Reverse)
-byte lim3Llow = 75, lim3Rlow = 110; // limited top speed angles! A slight offset towards reverse is required with this ESC
-byte lim4L = 45, lim4R = 135;
-
-// Motor configuration
-int maxPWMfull = 255;
-int maxPWMlimited = 170;
-int minPWM = 0;
-byte maxAccelerationFull = 7;
-byte maxAccelerationLimited = 12;
-
-// Variables for self balancing (vehicleType = 4) only!
-float tiltCalibration = 0.0;
-
-// Steering configuration
-byte steeringTorque = 255;
-
-// Motor 2 PWM frequency
-byte pwmPrescaler2 = 8; // 3936Hz
-
-// Additional Channels
-boolean TXO_momentary1 = true;
-boolean TXO_toggle1 = false;
-boolean potentiometer1 = false;
 
 // Engine sound
 boolean engineSound = false;
@@ -1909,127 +1735,6 @@ byte pwmPrescaler2 = 8; // 3936Hz
 boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
-
-// Engine sound
-boolean engineSound = false;
-
-// Tone sound
-boolean toneOut = false;
-#endif
-
-// 1:16 WPL B-36 Russian URAL-4320 Military Command Truck (Gearbox switched with 3 pos switch, old)--------------------------
-#ifdef CONFIG_WPL_B_36
-// Battery type
-boolean liPo = false;
-float cutoffVoltage = 0.0; // 6V receiver supply voltage, but Sound module causes a lot of noise!
-
-// Board type
-float boardVersion = 1.2;
-boolean HP = false;
-
-// Vehicle address
-int vehicleNumber = 9;
-
-// Vehicle type
-byte vehicleType = 0;
-
-// Lights
-boolean escBrakeLights = false;
-boolean tailLights = false;
-boolean headLights = false;
-boolean indicators = false;
-boolean beacons = false;
-
-// Servo limits
-byte lim1L = 64, lim1R = 137; // R67  L137
-//byte lim2L = 43, lim2R = 120; // Gearbox shifter limits (1. and 2. gear)
-byte lim2L = 120, lim2C = 120, lim2R = 43; // 3 speed gearbox shifting servo (3., 2., 1. gear)
-byte lim3L = 150, lim3R = 35; // ESC output signal reversed
-byte lim3Llow = 150, lim3Rlow = 35; // 2 speed transmission, so same values!
-byte lim4L = 45, lim4R = 135;
-#define THREE_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2. Defined as 3 speed, because we want to use the 3 position switch
-// Not usable in combination with the "tailLights" option
-
-// Motor configuration
-int maxPWMfull = 255;
-int maxPWMlimited = 170;
-int minPWM = 0;
-byte maxAccelerationFull = 7;
-byte maxAccelerationLimited = 12;
-
-// Variables for self balancing (vehicleType = 4) only!
-float tiltCalibration = 0.0;
-
-// Steering configuration
-byte steeringTorque = 255;
-
-// Motor 2 PWM frequency
-byte pwmPrescaler2 = 8; // 3936Hz
-
-// Additional Channels
-boolean TXO_momentary1 = false;
-boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
-
-// Engine sound
-boolean engineSound = false;
-
-// Tone sound
-boolean toneOut = false;
-#endif
-
-// Serial commands for ESP32 light and sound controller test (Tamiya Truck?) ---------------------------------------
-#ifdef CONFIG_SERIAL_TEST
-// Battery type
-boolean liPo = false; // LiPo is protected by ESC
-float cutoffVoltage = 4.0; // 5V supply
-
-// Board type
-float boardVersion = 1.5;
-boolean HP = false;
-
-// Vehicle address
-int vehicleNumber = 9;
-
-// Vehicle type
-byte vehicleType = 0;
-
-// Lights
-boolean escBrakeLights = false;
-boolean tailLights = false;
-boolean headLights = false;
-boolean indicators = false;
-boolean beacons = false;
-
-// Servo limits
-byte lim1L = 135, lim1R = 45; // Steering R 155, L 65
-byte lim2L = 45, lim2C = 90, lim2R = 135; // 3 speed gearbox shifting servo 71 = 3. gear, 106 2. gear, 146 = 1. gear.
-byte lim3L = 135, lim3R = 45; // ESC
-byte lim3Llow = 105, lim3Rlow = 75; // limited top speed ESC angles!
-byte lim4L = 45, lim4R = 135; // Controlled by pot, for sound triggering!
-#define THREE_SPEED_GEARBOX // Vehicle has a mechanical 3 speed shifting gearbox, switched by servo CH2.
-// Not usable in combination with the "tailLights" option
-
-// Motor configuration
-int maxPWMfull = 255;
-int maxPWMlimited = 170;
-int minPWM = 0;
-byte maxAccelerationFull = 7;
-byte maxAccelerationLimited = 12;
-
-// Variables for self balancing (vehicleType = 4) only!
-float tiltCalibration = 0.0;
-
-// Steering configuration
-byte steeringTorque = 255;
-
-// Motor 2 PWM frequency
-byte pwmPrescaler2 = 8; // 3936Hz
-
-// Additional Channels
-boolean TXO_momentary1 = false;
-boolean TXO_toggle1 = false;
-boolean potentiometer1 = true;
 
 // Engine sound
 boolean engineSound = false;
@@ -2435,6 +2140,67 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// 1:12 MN Model Landrover Defender D90 with 2 speed transmission & ESP32 sound controller (everything is controlled via SBUS)------------------------------
+#ifdef CONFIG_MN_D90
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 0.0; // 5V receiver supply voltage, but sound controller is handling cutoff
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 18;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits (not used, servos controlled via SBUS)
+#define STEERING_3_POINT_CAL // steering center point is separately adjustable
+byte lim1L = 45, lim1C = 99, lim1R = 135; // R56 C91 L120
+byte lim2L = 15, lim2R = 104; // Gearbox shifter limits (1. and 2. gear, 41, 123)
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 150, lim3Rlow = 35; // 2 speed transmission, so same values!
+byte lim4L = 45, lim4R = 135;
+#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 
