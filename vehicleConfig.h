@@ -4,7 +4,7 @@
 
 #include "Arduino.h"
 
-#define CONFIG_BRUSHLESS_D90 // <- Select the correct vehicle configuration here before uploading! CONFIG_WPL_B_36_MODE1  CONFIG_CATERPILLAR_TEST  CONFIG_KING_HAULER
+#define CONFIG_OPEN_RC_TRACTOR // <- Select the correct vehicle configuration here before uploading! CONFIG_WPL_B_36_MODE1  CONFIG_CATERPILLAR_TEST  CONFIG_KING_HAULER
 
 // NOTE: SBUS not usable if "TXO_momentary1" or "TXO_toggle1" or "headLights" or DEBUG!
 #define SBUS_SERIAL // serial connection uses SBUS protocol instead of normal protocol, if not commented out
@@ -2140,6 +2140,67 @@ byte pwmPrescaler2 = 32;
 
 // Additional Channels
 boolean TXO_momentary1 = true;
+boolean TXO_toggle1 = false;
+boolean potentiometer1 = false;
+
+// Engine sound
+boolean engineSound = false;
+
+// Tone sound
+boolean toneOut = false;
+#endif
+
+// 1:10 OpenRcTractor with ESP32 sound controller (nano receiver, everything is controlled via SBUS)------------------------------
+#ifdef CONFIG_OPEN_RC_TRACTOR
+// Battery type
+boolean liPo = false;
+float cutoffVoltage = 0.0; // 5V receiver supply voltage, but sound controller is handling cutoff
+
+// Board type
+float boardVersion = 1.4;
+boolean HP = false;
+
+// Vehicle address
+int vehicleNumber = 17;
+
+// Vehicle type
+byte vehicleType = 0;
+
+// Lights
+boolean escBrakeLights = false;
+boolean tailLights = false;
+boolean headLights = false;
+boolean indicators = false;
+boolean beacons = false;
+
+// Servo limits (not used, servos controlled via SBUS)
+#define STEERING_3_POINT_CAL // steering center point is separately adjustable
+byte lim1L = 45, lim1C = 99, lim1R = 135; // R56 C91 L120
+byte lim2L = 15, lim2R = 104; // Gearbox shifter limits (1. and 2. gear, 41, 123)
+byte lim3L = 150, lim3R = 35; // ESC output signal reversed
+byte lim3Llow = 150, lim3Rlow = 35; // 2 speed transmission, so same values!
+byte lim4L = 45, lim4R = 135;
+#define TWO_SPEED_GEARBOX // Vehicle has a mechanical 2 speed shifting gearbox, switched by servo CH2.
+// Not usable in combination with the "tailLights" option
+
+// Motor configuration
+int maxPWMfull = 255;
+int maxPWMlimited = 170;
+int minPWM = 0;
+byte maxAccelerationFull = 7;
+byte maxAccelerationLimited = 12;
+
+// Variables for self balancing (vehicleType = 4) only!
+float tiltCalibration = 0.0;
+
+// Steering configuration
+byte steeringTorque = 255;
+
+// Motor 2 PWM frequency
+byte pwmPrescaler2 = 8; // 3936Hz
+
+// Additional Channels
+boolean TXO_momentary1 = false;
 boolean TXO_toggle1 = false;
 boolean potentiometer1 = false;
 

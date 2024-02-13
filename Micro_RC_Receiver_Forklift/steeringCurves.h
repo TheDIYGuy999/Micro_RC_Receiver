@@ -11,29 +11,11 @@
 
 // In order to optimize the steering behaviour for your vehicle, just change the steering curves in the arrays below
 
-// This array is intended for the "Semi caterpillar" mode. The inner wheel can max. slow down to 60% of the
-// outer wheels RPM
-float curveSemi[][2] = {  // see excel sheet!
-  {0, 60} // {input value, output value}
-  , {25, 70}
-  , {50, 80}
-  , {75, 90}
-  , {100, 100}
-};
 
-// This array is intended for the "Caterpillar" mode. The inner wheel can spin backwars  up to 100% of the
-// outer wheels RPM. That allows for turning the vehicle "in place"
-float curveFull[][2] = {
-  {0, -100} // {input value, output value}
-  , {25, 9}
-  , {50, 61}
-  , {75, 87}
-  , {100, 100}
-};
 
-// This array is intended for the "Forklift2" mode. The inner wheel can spin backwars  up to 100% of the
+// This array is intended for the "forklifts". The inner wheel can spin backwars  up to 100% of the
 // outer wheels RPM. That allows for turning the vehicle "in place"
-float curveForklift2[][2] = { // see excel sheet!
+float curveForklift[][2] = { // see excel sheet!
   {0, -100} // {input value, output value}
   , {6, -70}
   , {11, -45}
@@ -46,16 +28,6 @@ float curveForklift2[][2] = { // see excel sheet!
   , {67, 62}
   , {78, 75}
   , {89, 88}
-  , {100, 100}
-};
-
-// This array is intended for the "Differential Thrust" mode. The inner motor can max. slow down to 20% of the
-// outer motors RPM
-float curveThrust[][2] = {  // see excel sheet!
-  {0, 20} // {input value, output value}
-  , {25, 40}
-  , {50, 60}
-  , {75, 80}
   , {100, 100}
 };
 
