@@ -101,12 +101,12 @@ Servo servo4;
 unsigned long millisLightOff = 0;
 
 // Indicators
-boolean left;
-boolean right;
-boolean hazard;
+bool left;
+bool right;
+bool hazard;
 
 // Motors
-boolean isDriving;  // is the vehicle driving?
+bool isDriving;  // is the vehicle driving?
 
 // Motor objects
 TB6612FNG Motor1;
@@ -118,6 +118,10 @@ boolean serialCommands;
 // ESC variables for tracked and half tracked mode
 int lEsc;
 int rEsc;
+
+// Channel buffer
+byte CH3;
+byte CH4;
 
 //
 // =======================================================================================================
@@ -289,6 +293,32 @@ void readRadio() {
 
 //
 // =======================================================================================================
+// EXPONENTIAL CURVES
+// =======================================================================================================
+//
+
+
+void exponentialCurves() {
+  static uint16_t CH3MicroSeconds;
+  static uint16_t CH4MicroSeconds;
+
+  if (data.mode2) {  // Use mode 2 button to switch between linear and exponential mode
+    CH3MicroSeconds = map(data.axis3, 100, 0, 2000, 1000);
+    CH3MicroSeconds = reMap(curveExponentialThrottle, CH3MicroSeconds);
+    CH3 = map(CH3MicroSeconds, 2000, 1000, 100, 0);
+
+    CH4MicroSeconds = map(data.axis4, 100, 0, 2000, 1000);
+    CH4MicroSeconds = reMap(curveExponentialThrottle, CH4MicroSeconds);
+    CH4 = map(CH4MicroSeconds, 2000, 1000, 100, 0);
+  } else {
+    CH3 = data.axis3;
+    CH4 = data.axis4;
+  }
+}
+
+
+//
+// =======================================================================================================
 // WRITE SERVO POSITIONS
 // =======================================================================================================
 //
@@ -299,7 +329,7 @@ void writeServos() {
   servo2.write(map(data.axis2, 100, 0, lim2L, lim2R));
 
   // steering servo ----------------------------
-  servo4.write(map(data.axis4, 100, 0, lim4L, lim4R));
+  servo4.write(map(CH4, 100, 0, lim4L, lim4R));
 }
 
 //
@@ -319,24 +349,24 @@ void driveMotorsSteering() {
   int steeringFactorRight2;
 
   // The input signal range
-  const int servoMin = 5;
-  const int servoMax = 95;
+  const int servoMin = 1;
+  const int servoMax = 99;
   const int servoNeutralMin = 48;
   const int servoNeutralMax = 52;
 
   // Compute steering overlay:
-  // The steering signal is channel 4 = data.axis4
+  // The steering signal is channel 4 = CH4
   // 100% = wheel spins with 100% of the requested speed forward
   // -100% = wheel spins with 100% of the requested speed backward
-  if (data.axis4 <= servoNeutralMin) {
-    steeringFactorLeft = map(data.axis4, servoMin, servoNeutralMin, 0, 100);
+  if (CH4 <= servoNeutralMin) {
+    steeringFactorLeft = map(CH4, servoMin, servoNeutralMin, 0, 100);
     steeringFactorLeft = constrain(steeringFactorLeft, 0, 100);
   } else {
     steeringFactorLeft = 100;
   }
 
-  if (data.axis4 >= servoNeutralMax) {
-    steeringFactorRight = map(data.axis4, servoMax, servoNeutralMax, 0, 100);
+  if (CH4 >= servoNeutralMax) {
+    steeringFactorRight = map(CH4, servoMax, servoNeutralMax, 0, 100);
     steeringFactorRight = constrain(steeringFactorRight, 0, 100);
   } else {
     steeringFactorRight = 100;
@@ -350,8 +380,8 @@ void driveMotorsSteering() {
   // Drive caterpillar motors
   // The throttle signal (for both caterpillars) is channel 3 = data.axis3
   // -100 to 100%
-  pwm[0] = map(data.axis3, servoMin, servoMax, 100, -100) * steeringFactorRight2 / 100;
-  pwm[1] = map(data.axis3, servoMin, servoMax, 100, -100) * steeringFactorLeft2 / 100;
+  pwm[0] = map(CH3, servoMin, servoMax, 100, -100) * steeringFactorRight2 / 100;
+  pwm[1] = map(CH3, servoMin, servoMax, 100, -100) * steeringFactorLeft2 / 100;
 
   pwm[0] = map(pwm[0], 100, -100, 100, 0);  // convert -100 to 100% to 0-100 for motor control
   pwm[1] = map(pwm[1], 100, -100, 100, 0);
@@ -497,6 +527,9 @@ void loop() {
 
   // Read radio data from transmitter
   readRadio();
+
+  // Exponential throttle and steering
+  exponentialCurves();
 
   // Write the servo positions
   writeServos();
